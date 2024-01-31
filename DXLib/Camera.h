@@ -52,7 +52,7 @@ namespace DX
 	public:
 		~Camera();
 		void SetFrame(const FRAME_KIND fKind, XMFLOAT2 orthoSize, const float nearPlane, const float farPlane, const float verticalViewAngle, const float aspectRatio);
-		void Update();
+		void Update() override;
 		void SetProj(XMMATRIX mat);
 
 		const XMMATRIX& VMat()const { return viewMat; }

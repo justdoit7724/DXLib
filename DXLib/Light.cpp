@@ -17,7 +17,7 @@
 using namespace DX;
 
 DirectionalLight::DirectionalLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMFLOAT3 s, float intensity, XMFLOAT3 dir)
-	:Light(graphic, id)
+	:Light(graphic, id, ActorKind::Light_Direction)
 {
 	D3D11_BUFFER_DESC cb_desc;
 	cb_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -96,9 +96,8 @@ XMFLOAT3 DirectionalLight::GetDir()const
 	return XMFLOAT3(dir.x, dir.y, dir.z);
 }
 
-void DirectionalLight::Apply()
+void DirectionalLight::Update()
 {
-
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	ZeroMemory(&mappedData, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
@@ -110,10 +109,8 @@ void DirectionalLight::Apply()
 	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_DIRECTIONAL_LIGHT, 1, &m_cb);
 }
 
-
-
 PointLight::PointLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMFLOAT3 s, float intensity, XMFLOAT3 att, XMFLOAT3 pos)
-	:Light(graphic,id)
+	:Light(graphic,id, ActorKind::Light_Point)
 {
 	D3D11_BUFFER_DESC cb_desc;
 	cb_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -201,11 +198,11 @@ XMFLOAT3 DX::PointLight::GetPos()
 	return XMFLOAT3(m_data.pos[m_id].x, m_data.pos[m_id].y, m_data.pos[m_id].z);
 }
 
-void PointLight::Apply()
+void PointLight::Update()
 {
 	HRESULT hr;
 
-	
+
 
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 
@@ -218,7 +215,7 @@ void PointLight::Apply()
 }
 
 SpotLight::SpotLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMFLOAT3 s, float r, float spot, float intensity, float rad, XMFLOAT3 att, XMFLOAT3 pos, XMFLOAT3 dir)
-	:Light(graphic, id)
+	:Light(graphic, id, ActorKind::Light_Spot)
 {
 	D3D11_BUFFER_DESC cb_desc;
 	cb_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -319,11 +316,9 @@ XMFLOAT3 DX::SpotLight::GetPos()
 	return XMFLOAT3(m_data.pos[m_id].x, m_data.pos[m_id].y, m_data.pos[m_id].z);
 }
 
-
-void SpotLight::Apply()
+void DX::SpotLight::Update()
 {
 	HRESULT hr;
-
 
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 
@@ -335,7 +330,7 @@ void SpotLight::Apply()
 	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_SPOT_LIGHT, 1, &m_cb);
 }
 
-DX::Light::Light(const Graphic* graphic,int id)
-	:Actor(graphic), m_id(id)
+DX::Light::Light(const Graphic* graphic,int id, ActorKind lightKind)
+	:Actor(graphic, lightKind), m_id(id)
 {
 }

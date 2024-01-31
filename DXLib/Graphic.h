@@ -1,17 +1,11 @@
 #pragma once
+#include <unordered_map>
+#include "Actor.h"
+
 
 namespace DX
 {
 	class VertexLayout;
-	class Actor;
-
-	enum class ActorKind {
-		Object,
-		Camera,
-		Light_Direction,
-		Light_Point,
-		Light_Spot
-	};
 
 	class DXLIB_DLL Graphic
 	{
@@ -29,8 +23,10 @@ namespace DX
 		ID3D11RenderTargetView* RTV();
 		HWND GetHWND();
 
-		Actor* CreateActor(ActorKind kind);
-
+		void CreateActor(ActorKind kind, Actor** out);
+		std::unordered_map<ActorKind, std::vector<Actor*>> GetAllActors() const;
+		Actor* MainCamera() const;
+		void SetMainCamera(Actor* cam);
 
 	private:
 		Graphic() = delete;
@@ -48,7 +44,10 @@ namespace DX
 		ID3D11DepthStencilView* m_dsView;
 		ID3D11RasterizerState* m_rasterizerState;
 
-		std::vector<Actor*> m_actors;
+		std::unordered_map<ActorKind, std::vector<Actor*>> m_actors;
+
+		Actor* m_mainCamera;
+
 	};
 
 

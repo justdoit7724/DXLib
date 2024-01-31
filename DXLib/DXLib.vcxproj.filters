@@ -16,11 +16,11 @@
     <Filter Include="HLSL">
       <UniqueIdentifier>{b519ef85-4d9c-4eaa-a586-23bce7c78df2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object">
-      <UniqueIdentifier>{0169cd75-e37d-4bcc-a1b2-302314b52204}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{d928ff64-551a-433c-a6c7-66ad4ef542c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actors">
+      <UniqueIdentifier>{0169cd75-e37d-4bcc-a1b2-302314b52204}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,9 +40,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Collider.h">
@@ -123,9 +120,6 @@
     <ClInclude Include="TurnController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DXLibExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -139,7 +133,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
-      <Filter>Object</Filter>
+      <Filter>Actors</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
@@ -150,11 +144,26 @@
     <ClInclude Include="Graphic.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WorldGraphic.h">
-      <Filter>Header Files</Filter>
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot2DGraphic.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot3DGraphic.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -171,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Collider.cpp">
@@ -195,9 +201,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DepthStencilState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LineMesh.cpp">
@@ -240,7 +243,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>Object</Filter>
+      <Filter>Actors</Filter>
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>Source Files</Filter>
@@ -248,11 +251,26 @@
     <ClCompile Include="Graphic.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WorldGraphic.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Plot2DGraphic.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Plot3DGraphic.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Actors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

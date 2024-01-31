@@ -69,7 +69,7 @@ Object::Object(ID3D11Device* device, ID3D11DeviceContext* dContext, std::string 
 */
 
 DX::Object::Object(Graphic* graphic)
-	:Actor(graphic), m_mesh(nullptr), m_isUnlit(false)
+	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false)
 {
 	transform = new Transform();
 	auto layout = D3DLayout_Std().GetLayout();
@@ -187,41 +187,33 @@ void Object::Visualize()
 }
 
 
-void Object::Render(ID3D11DeviceContext* dContext)const
+void Object::Render()
 {
-	vs->Apply(dContext);
-	ps->Apply(dContext);
 
-	dsState->Apply(dContext);
-	blendState->Apply(dContext);
-	rsState->Apply(dContext);
-
-	m_mesh->Apply(dContext);
-}
-void Object::Render(ID3D11DeviceContext* dContext, const Camera* camera, const Frustum* frustum) const
-{
 	if (!enabled || !show)
 		return;
 
-	if (IsInsideFrustum(frustum))
+	Camera* curCam = (Camera*)m_graphic->MainCamera();
+	
+
+	if (curCam && IsInsideFrustum(curCam->GetFrustum()))
 	{
-		auto vmat = camera->VMat();
-		auto pmat = camera->ProjMat();
+		auto vmat = curCam->VMat();
+		auto pmat = curCam->ProjMat();
 
-		const SHADER_STD_TRANSF STransformation(transform->WorldMatrix(), vmat, pmat, 1,1000,XM_PIDIV2,1);
-		vs->WriteCB(dContext,0, &STransformation);
+		const SHADER_STD_TRANSF STransformation(transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
+		vs->WriteCB(m_graphic->DContext(), 0, &STransformation);
 
+		vs->Apply(m_graphic->DContext());
+		ps->Apply(m_graphic->DContext());
 
-		Render(dContext);
+		dsState->Apply(m_graphic->DContext());
+		blendState->Apply(m_graphic->DContext());
+		rsState->Apply(m_graphic->DContext());
+
+		m_mesh->Apply(m_graphic->DContext());
 	}
-}
 
-void Object::RenderGeom(ID3D11DeviceContext* dContext) const
-{
-	if (!enabled || !show)
-		return;
-
-	m_mesh->Apply(dContext);
 }
 
 bool Object::IsInsideFrustum(const Frustum* frustum) const

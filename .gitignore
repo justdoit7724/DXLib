@@ -16,8 +16,12 @@
 *.tlog
 *.idb
 *.cso
-*.dll
-*.lib
+
+DXLib/[Xx]64/
+DXLib/[Ww]in32/
+
+[Xx]64/
+[Ww]in32/
 
 
 *.exp

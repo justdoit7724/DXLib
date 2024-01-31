@@ -7,7 +7,7 @@
 using namespace DX;
 
 Camera::Camera(FRAME_KIND frameKind, float orthoScnWidth, float orthoScnHeight, float n, float f, float verticalViewRad, float aspectRatio, bool skipFrustum)
-	:Actor(nullptr)
+	:Actor(nullptr, ActorKind::Camera)
 {
 	transform = new Transform();
 

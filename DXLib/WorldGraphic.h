@@ -8,6 +8,7 @@ namespace DX
     {
     public:
         WorldGraphic(HWND hwnd, int msaa = 1);
+
+    private:
     };
 }
-

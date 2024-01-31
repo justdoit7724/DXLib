@@ -23,7 +23,7 @@ struct SHADER_SPOT_LIGHT;
 		XMFLOAT3 specular;
 		ID3D11Buffer* m_cb;
 
-		Light(const Graphic* graphic, int id);
+		Light(const Graphic* graphic, int id, ActorKind lightKind);
 
 
 	public:
@@ -39,8 +39,6 @@ struct SHADER_SPOT_LIGHT;
 		virtual void SetSpecular(const XMFLOAT3& s) = 0;
 		virtual void SetIntensity(float i) = 0;
 		virtual void Enable(bool enable) = 0;
-
-		virtual void Apply() = 0;
 	};
 
 	class DXLIB_DLL DirectionalLight : public Light
@@ -62,7 +60,7 @@ struct SHADER_SPOT_LIGHT;
 		void SetDir(XMFLOAT3 d);
 		XMFLOAT3 GetDir()const;
 
-		void Apply() override;
+		void Update()override;
 	};
 
 	class DXLIB_DLL PointLight : public Light
@@ -88,7 +86,7 @@ struct SHADER_SPOT_LIGHT;
 
 		XMFLOAT3 GetPos();
 
-		void Apply()override;
+		void Update()override;
 	};
 
 	class DXLIB_DLL SpotLight : public Light
@@ -121,7 +119,7 @@ struct SHADER_SPOT_LIGHT;
 
 		XMFLOAT3 GetPos();
 
-		void Apply()override;
+		void Update()override;
 	};
 
 }

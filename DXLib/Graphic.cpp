@@ -9,7 +9,6 @@
 #include "Light.h"
 #include "Camera.h"
 #include "CubeMesh.h"
-#include "Actor.h"
 
 namespace DX {
 
@@ -17,6 +16,7 @@ namespace DX {
 	VertexLayout D3DVertLayout_Std;
 
 	Graphic::Graphic(HWND _hwnd, int msaa)
+		:m_mainCamera(nullptr)
 	{
 		assert(msaa == 1 || msaa == 2 || msaa == 4 || msaa == 8 || msaa == 16);
 
@@ -175,9 +175,42 @@ namespace DX {
 
 	void Graphic::Present()
 	{
-		for (auto& a : m_actors)
+		for (auto it = m_actors.begin(); it!=m_actors.end(); ++it)
 		{
-			a->Update();
+			if (it->second.empty())
+			{
+				it = m_actors.erase(it);
+				continue;
+			}
+			
+			for (int i = 0; i < it->second.size();)
+			{
+				Actor* curActor = it->second[i];
+				if (curActor->isRelease)
+				{
+					if (curActor == m_mainCamera)
+					{
+						m_mainCamera = nullptr;
+					}
+
+					delete curActor;
+					it->second.erase(it->second.begin() + i);
+				}
+				else
+					i++;
+			}
+
+
+			for (int i = 0; i < it->second.size(); i++)
+			{
+				it->second[i]->Update();
+			}
+			for (int i = 0; i < it->second.size();i++)
+			{
+				it->second[i]->Render();
+			}
+			
+
 		}
 
 
@@ -221,10 +254,8 @@ namespace DX {
 		return m_hwnd;
 	}
 
-	Actor* Graphic::CreateActor(ActorKind kind)
+	void Graphic::CreateActor(ActorKind kind, Actor** out)
 	{
-		Actor* newActor = nullptr;
-
 		switch (kind)
 		{
 		case DX::ActorKind::Object:
@@ -236,17 +267,22 @@ namespace DX {
 			newObject->SetShape(defaultMesh);
 			newObject->SetUnlit(false);
 
-			newActor = newObject;
+			*out = newObject;
 		}
 		break;
 		case DX::ActorKind::Camera:
 
-			newActor = new Camera(FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, false);
+			*out = new Camera(FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, false);
+
+			if (!m_mainCamera)
+			{
+				m_mainCamera = *out;
+			}
 
 			break;
 		case DX::ActorKind::Light_Direction:
 
-			newActor = new DirectionalLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
+			*out = new DirectionalLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
 				XMFLOAT3(0.8, 0.8, 0.8),
 				XMFLOAT3(0.7, 0.7, 0.7),
 				0.7f,
@@ -255,7 +291,7 @@ namespace DX {
 			break;
 		case DX::ActorKind::Light_Point:
 
-			newActor = new PointLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
+			*out = new PointLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
 				XMFLOAT3(0.8, 0.8, 0.8),
 				XMFLOAT3(0.7, 0.7, 0.7),
 				0.7f,
@@ -265,16 +301,37 @@ namespace DX {
 				break;
 		case DX::ActorKind::Light_Spot:
 
-			newActor = new DirectionalLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
+			*out = new DirectionalLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
 				XMFLOAT3(0.8, 0.8, 0.8),
 				XMFLOAT3(0.7, 0.7, 0.7),
 				0.7f,
 				DX::Normalize(XMFLOAT3(1, 0, 0)));
 
 				break;
+		default:
+
+			assert(false && "unidentified actor kind");
+			break;
 		}
-		return newActor;
+
+		m_actors[kind].push_back(*out);
 	}
+
+	std::unordered_map<ActorKind, std::vector<Actor*>> Graphic::GetAllActors()const
+	{
+		return m_actors;
+	}
+
+	Actor* Graphic::MainCamera()const
+	{
+		return m_mainCamera;
+	}
+
+	void Graphic::SetMainCamera(Actor* cam)
+	{
+		m_mainCamera = cam;
+	}
+
 
 	const VertexLayout& D3DLayout_Simple()
 	{

@@ -19,6 +19,29 @@
 
 #pragma once
 
+
+
+#ifdef _WIN64
+
+#ifdef _DEBUG
+#pragma comment(lib, __FILE__"\\..\\DirectXTK\\x64\\Debug\\DirectXTK.lib")
+#else
+#pragma comment(lib, __FILE__"\\..\\DirectXTK\\x64\\Release\\DirectXTK.lib")
+#endif
+
+#else
+S
+#ifdef _DEBUG
+#pragma comment(lib, __FILE__"\\..\\DirectXTK\\Win32\\Debug\\DirectXTK.lib")
+#else
+#pragma comment(lib, __FILE__"\\..\\DirectXTK\\Win32\\Release\\DirectXTK.lib")
+#endif
+
+#endif
+
+
+
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
 

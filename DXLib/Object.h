@@ -35,17 +35,15 @@ namespace DX {
 		std::shared_ptr <Collider> m_collider;
 		bool m_isUnlit;
 
-
 		friend class Graphic;
 		Object(Graphic* graphic);
 		virtual ~Object();
 
 	public:
 
-		virtual void Update();
-		virtual void Render(ID3D11DeviceContext* dContext, const Camera* camera, const Frustum* frustum) const;
-		virtual void RenderGeom(ID3D11DeviceContext* dContext) const;
-
+		void Update() override;
+		void Render() override;
+	
 		virtual bool IsPicking(Geometrics::Ray ray)const;
 		virtual void UpdateBound();
 		virtual void UpdateCollider();
@@ -70,7 +68,6 @@ namespace DX {
 
 		void Visualize() override;
 
-		void Render(ID3D11DeviceContext* dContext)const;
 		virtual bool IsInsideFrustum(const Frustum* frustum) const;
 
 		bool enabled = true;
