@@ -4,7 +4,7 @@
 
 #include "Graphic.h"
 #include "MathHelper.h"
-#include "Vertex.h"
+
 #include "Object.h"
 #include "Light.h"
 #include "Camera.h"
@@ -15,8 +15,6 @@
 
 namespace DX {
 
-	VertexLayout D3DVertLayout_Simple;
-	VertexLayout D3DVertLayout_Std;
 
 	Graphic::Graphic(HWND _hwnd, int msaa)
 		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false)
@@ -166,16 +164,11 @@ namespace DX {
 		samp->Release();
 #pragma endregion
 
-		D3DVertLayout_Simple.Clear();
-		D3DVertLayout_Simple.Append(VE_Position3D);
 
-		D3DVertLayout_Std.Clear();
-		D3DVertLayout_Std
-			.Append(VE_Position3D)
-			.Append(VE_Texture2D)
-			.Append(VE_Normal)
-			.Append(VE_Float4Color);
-
+		m_vertLayout.push_back({"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0});
+		m_vertLayout.push_back({"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+		m_vertLayout.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+		m_vertLayout.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 		
 	}
 
@@ -277,6 +270,11 @@ namespace DX {
 	HWND Graphic::GetHWND()
 	{
 		return m_hwnd;
+	}
+
+	std::vector<D3D11_INPUT_ELEMENT_DESC> Graphic::GetLayout()
+	{
+		return m_vertLayout;
 	}
 
 	void Graphic::CreateActor(ActorKind kind, Actor** out)
@@ -443,14 +441,6 @@ namespace DX {
 	}
 
 
-	const VertexLayout& D3DLayout_Simple()
-	{
-		return D3DVertLayout_Simple;
-	}
-	const VertexLayout& D3DLayout_Std()
-	{
-		return D3DVertLayout_Std;
-	}
 }
 	
 

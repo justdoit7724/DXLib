@@ -1,5 +1,5 @@
 #pragma once
-#include "Vertex.h"
+
 
 #define LIGHT_ENABLED 1
 #define LIGHT_DISABLED 0

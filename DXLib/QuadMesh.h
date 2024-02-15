@@ -3,13 +3,12 @@
 #include "Mesh.h"
 
 namespace DX {
-	class VertexLayout;
 
 	class DXLIB_DLL QuadMesh :
 		public Mesh
 	{
 	public:
-		QuadMesh(ID3D11Device* device, VertexLayout layout);
+		QuadMesh(ID3D11Device* device);
 	};
 }
 

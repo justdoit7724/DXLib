@@ -26,94 +26,83 @@ const int OBJ_CUBE_INDICE[INDEX_COUNT] =
 
 DX::CubeMesh::CubeMesh(ID3D11Device* device)
 {
-	auto layout = D3DLayout_Std();
-
-	for (int i = 0; i < 30; ++i)
-	{
-		EmplaceBack();
-	}
-	if (layout.Resolve<VE_Position3D>())
-	{
-		GetVertex(0).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
-		GetVertex(1).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
-		GetVertex(2).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
-		GetVertex(3).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
-		GetVertex(4).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
-		GetVertex(5).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
-		GetVertex(6).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
-		GetVertex(7).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
-		GetVertex(8).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
-		GetVertex(9).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
-		GetVertex(10).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
-		GetVertex(11).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
-		GetVertex(12).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
-		GetVertex(13).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
-		GetVertex(14).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
-		GetVertex(15).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
-		GetVertex(16).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
-		GetVertex(17).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
-		GetVertex(18).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
-		GetVertex(19).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
-		GetVertex(20).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
-		GetVertex(21).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
-		GetVertex(22).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
-		GetVertex(23).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
-		
-	}
-	if (layout.Resolve<VE_Texture2D>())
-	{
-		GetVertex(0).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		GetVertex(1).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		GetVertex(2).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		GetVertex(3).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		GetVertex(4).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		GetVertex(5).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		GetVertex(6).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		GetVertex(7).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		GetVertex(8).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		GetVertex(9).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		GetVertex(10).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		GetVertex(11).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		GetVertex(12).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		GetVertex(13).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		GetVertex(14).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		GetVertex(15).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		GetVertex(16).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		GetVertex(17).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		GetVertex(18).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		GetVertex(19).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		GetVertex(20).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		GetVertex(21).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		GetVertex(22).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		GetVertex(23).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-	}
-	if (layout.Resolve<VE_Normal>())
-	{
-		GetVertex(0).Attr< VE_Normal>() = BACKWARD;
-		GetVertex(1).Attr< VE_Normal>() = BACKWARD;
-		GetVertex(2).Attr< VE_Normal>() = BACKWARD;
-		GetVertex(3).Attr< VE_Normal>() = BACKWARD;
-		GetVertex(4).Attr< VE_Normal>() = RIGHT;
-		GetVertex(5).Attr< VE_Normal>() = RIGHT;
-		GetVertex(6).Attr< VE_Normal>() = RIGHT;
-		GetVertex(7).Attr< VE_Normal>() = RIGHT;
-		GetVertex(8).Attr< VE_Normal>() = FORWARD;
-		GetVertex(9).Attr< VE_Normal>() = FORWARD;
-		GetVertex(10).Attr< VE_Normal>() = FORWARD;
-		GetVertex(11).Attr< VE_Normal>() = FORWARD;
-		GetVertex(12).Attr< VE_Normal>() = RIGHT;
-		GetVertex(13).Attr< VE_Normal>() = RIGHT;
-		GetVertex(14).Attr< VE_Normal>() = RIGHT;
-		GetVertex(15).Attr< VE_Normal>() = RIGHT;
-		GetVertex(16).Attr< VE_Normal>() = UP;
-		GetVertex(17).Attr< VE_Normal>() = UP;
-		GetVertex(18).Attr< VE_Normal>() = UP;
-		GetVertex(19).Attr< VE_Normal>() = UP;
-		GetVertex(20).Attr< VE_Normal>() = DOWN;
-		GetVertex(21).Attr< VE_Normal>() = DOWN;
-		GetVertex(22).Attr< VE_Normal>() = DOWN;
-		GetVertex(23).Attr< VE_Normal>() = DOWN;
-	}
+	m_vertice.resize(24);
+	
+	m_vertice[0].pos= XMFLOAT3(-0.5, -0.5, -0.5);
+	m_vertice[1].pos= XMFLOAT3(-0.5, 0.5, -0.5);
+	m_vertice[2].pos= XMFLOAT3(0.5, 0.5, -0.5);
+	m_vertice[3].pos= XMFLOAT3(0.5, -0.5, -0.5);
+	m_vertice[4].pos= XMFLOAT3(0.5, -0.5, -0.5);
+	m_vertice[5].pos= XMFLOAT3(0.5, 0.5, -0.5);
+	m_vertice[6].pos= XMFLOAT3(0.5, 0.5, 0.5);
+	m_vertice[7].pos= XMFLOAT3(0.5, -0.5, 0.5);
+	m_vertice[8].pos= XMFLOAT3(0.5, -0.5, 0.5);
+	m_vertice[9].pos= XMFLOAT3(0.5, 0.5, 0.5);
+	m_vertice[10].pos= XMFLOAT3(-0.5, 0.5, 0.5);
+	m_vertice[11].pos= XMFLOAT3(-0.5, -0.5, 0.5);
+	m_vertice[12].pos= XMFLOAT3(-0.5, -0.5, 0.5);
+	m_vertice[13].pos= XMFLOAT3(-0.5, 0.5, 0.5);
+	m_vertice[14].pos= XMFLOAT3(-0.5, 0.5, -0.5);
+	m_vertice[15].pos= XMFLOAT3(-0.5, -0.5, -0.5);
+	m_vertice[16].pos= XMFLOAT3(-0.5, 0.5, -0.5);
+	m_vertice[17].pos= XMFLOAT3(-0.5, 0.5, 0.5);
+	m_vertice[18].pos= XMFLOAT3(0.5, 0.5, 0.5);
+	m_vertice[19].pos= XMFLOAT3(0.5, 0.5, -0.5);
+	m_vertice[20].pos= XMFLOAT3(-0.5, -0.5, 0.5);
+	m_vertice[21].pos= XMFLOAT3(-0.5, -0.5, -0.5);
+	m_vertice[22].pos= XMFLOAT3(0.5, -0.5, -0.5);
+	m_vertice[23].pos= XMFLOAT3(0.5, -0.5, 0.5);
+	
+	
+	m_vertice[0].tex= XMFLOAT2(0, 1);
+	m_vertice[1].tex= XMFLOAT2(0, 0);
+	m_vertice[2].tex= XMFLOAT2(1, 0);
+	m_vertice[3].tex= XMFLOAT2(1, 1);
+	m_vertice[4].tex= XMFLOAT2(0, 1);
+	m_vertice[5].tex= XMFLOAT2(0, 0);
+	m_vertice[6].tex= XMFLOAT2(1, 0);
+	m_vertice[7].tex= XMFLOAT2(1, 1);
+	m_vertice[8].tex= XMFLOAT2(0, 1);
+	m_vertice[9].tex= XMFLOAT2(0, 0);
+	m_vertice[10].tex= XMFLOAT2(1, 0);
+	m_vertice[11].tex= XMFLOAT2(1, 1);
+	m_vertice[12].tex= XMFLOAT2(0, 1);
+	m_vertice[13].tex= XMFLOAT2(0, 0);
+	m_vertice[14].tex= XMFLOAT2(1, 0);
+	m_vertice[15].tex= XMFLOAT2(1, 1);
+	m_vertice[16].tex= XMFLOAT2(0, 1);
+	m_vertice[17].tex= XMFLOAT2(0, 0);
+	m_vertice[18].tex= XMFLOAT2(1, 0);
+	m_vertice[19].tex= XMFLOAT2(1, 1);
+	m_vertice[20].tex= XMFLOAT2(0, 1);
+	m_vertice[21].tex= XMFLOAT2(0, 0);
+	m_vertice[22].tex= XMFLOAT2(1, 0);
+	m_vertice[23].tex= XMFLOAT2(1, 1);
+	
+	m_vertice[0].normal= BACKWARD;
+	m_vertice[1].normal= BACKWARD;
+	m_vertice[2].normal= BACKWARD;
+	m_vertice[3].normal= BACKWARD;
+	m_vertice[4].normal= RIGHT;
+	m_vertice[5].normal= RIGHT;
+	m_vertice[6].normal= RIGHT;
+	m_vertice[7].normal= RIGHT;
+	m_vertice[8].normal= FORWARD;
+	m_vertice[9].normal= FORWARD;
+	m_vertice[10].normal = FORWARD;
+	m_vertice[11].normal = FORWARD;
+	m_vertice[12].normal = RIGHT;
+	m_vertice[13].normal = RIGHT;
+	m_vertice[14].normal = RIGHT;
+	m_vertice[15].normal = RIGHT;
+	m_vertice[16].normal = UP;
+	m_vertice[17].normal = UP;
+	m_vertice[18].normal = UP;
+	m_vertice[19].normal = UP;
+	m_vertice[20].normal = DOWN;
+	m_vertice[21].normal = DOWN;
+	m_vertice[22].normal = DOWN;
+	m_vertice[23].normal = DOWN;
 	
 	SetIndice(OBJ_CUBE_INDICE, INDEX_COUNT);
 	Update(device);

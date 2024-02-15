@@ -4,13 +4,11 @@
 
 namespace DX {
 
-	class VertexLayout;
-
 	class DXLIB_DLL SphereMesh :
 		public Mesh
 	{
 	public:
-		SphereMesh(ID3D11Device* device, const int numSubDivision, VertexLayout layout);
+		SphereMesh(ID3D11Device* device, const int numSubDivision);
 	};
 }
 

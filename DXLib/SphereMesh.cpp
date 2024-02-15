@@ -48,7 +48,7 @@ inline void Subdivide(std::vector<XMFLOAT3>& vertice, std::vector<int>& indice)
 	}
 }
 
-SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, VertexLayout layout)
+SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision)
 	:Mesh()
 {
 	// Put a cap on the number of subdivisions. 
@@ -93,14 +93,10 @@ SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, VertexLayout la
 		Subdivide(vertice, indice);
 	// Project vertices onto sphere and scale. 
 
-	const bool isTex = layout.Resolve<VE_Texture2D>();
-	const bool isNorm = layout.Resolve<VE_Normal>();
-
 	/**/
+	m_vertice.resize(vertice.size());
 	for (size_t i = 0; i < vertice.size(); ++i) {
 		
-		EmplaceBack();
-
 		XMFLOAT3 pos = vertice[i];
 		XMFLOAT3 n = Normalize(pos);
 
@@ -115,16 +111,11 @@ SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, VertexLayout la
 			-sinf(theta)
 		);*/
 
-		GetVertex(i).Attr<VE_Position3D>() = Div(pos,2.0);
+		m_vertice[i].pos = Div(pos, 2.0);
 
-		if (isTex)
-		{
-			GetVertex(i).Attr<VE_Texture2D>() = tex;
-		}
-		if (isNorm)
-		{
-			GetVertex(i).Attr<VE_Normal>() = n;
-		}
+		m_vertice[i].tex= tex;
+		
+		m_vertice[i].normal = n;
 	}
 
 	int* indiceData = indice.data();

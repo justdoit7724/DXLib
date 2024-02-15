@@ -31,18 +31,18 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisB = (Object*)tmp;
 	
 	LineMesh* mesh = new LineMesh();
-	mesh->EmplaceBack(5);
-	mesh->GetVertex(0).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, 0);
-	mesh->GetVertex(1).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, AXIS_WIDTH);
-	mesh->GetVertex(2).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, AXIS_WIDTH);
-	mesh->GetVertex(3).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, 0);
-	mesh->GetVertex(4).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, 0);
+	mesh->Resize(5);
+	mesh->SetPos(0, XMFLOAT3(AXIS_WIDTH, 0, 0)) ;
+	mesh->SetPos(1, XMFLOAT3(AXIS_WIDTH, 0, AXIS_WIDTH)); ;
+	mesh->SetPos(2, XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, AXIS_WIDTH));
+	mesh->SetPos(3, XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, 0)) ;
+	mesh->SetPos(4, XMFLOAT3(AXIS_WIDTH, 0, 0)) ;
 
-	mesh->GetVertex(0).Attr<VE_Float4Color>() = XMFLOAT4(0,0,0,1);
-	mesh->GetVertex(1).Attr<VE_Float4Color>() = XMFLOAT4(1,0,0, 1);
-	mesh->GetVertex(2).Attr<VE_Float4Color>() = XMFLOAT4(0,1,0, 1);
-	mesh->GetVertex(3).Attr<VE_Float4Color>() = XMFLOAT4(0,0,1, 1);
-	mesh->GetVertex(4).Attr<VE_Float4Color>() = XMFLOAT4(0,0,0, 1);
+	mesh->SetColor(0,XMFLOAT4(0,0,0,1));
+	mesh->SetColor(1,XMFLOAT4(1,0,0, 1));
+	mesh->SetColor(2,XMFLOAT4(0,1,0, 1));
+	mesh->SetColor(3,XMFLOAT4(0,0,1, 1));
+	mesh->SetColor(4,XMFLOAT4(0,0,0, 1));
 	std::vector<int> indiceR = { 0,1,2,3,4 };
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	mesh->Update(Device());
@@ -50,34 +50,34 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisPX->SetUnlit(true);
 
 	mesh = new LineMesh();
-	mesh->EmplaceBack(5);
-	mesh->GetVertex(0).Attr<VE_Position3D>() = XMFLOAT3(0, 0, 0);
-	mesh->GetVertex(1).Attr<VE_Position3D>() = XMFLOAT3(0, 0, AXIS_WIDTH);
-	mesh->GetVertex(2).Attr<VE_Position3D>() = XMFLOAT3(0, AXIS_HEIGHT, AXIS_WIDTH);
-	mesh->GetVertex(3).Attr<VE_Position3D>() = XMFLOAT3(0, AXIS_HEIGHT, 0);
-	mesh->GetVertex(4).Attr<VE_Position3D>() = XMFLOAT3(0, 0, 0);
-	mesh->GetVertex(0).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
-	mesh->GetVertex(1).Attr<VE_Float4Color>() = XMFLOAT4(1, 0, 0,1);
-	mesh->GetVertex(2).Attr<VE_Float4Color>() = XMFLOAT4(0, 1, 0,1);
-	mesh->GetVertex(3).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 1,1);
-	mesh->GetVertex(4).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
+	mesh->Resize(5);
+	mesh->SetPos(0,XMFLOAT3(0, 0, 0));
+	mesh->SetPos(1,XMFLOAT3(0, 0, AXIS_WIDTH));
+	mesh->SetPos(2,XMFLOAT3(0, AXIS_HEIGHT, AXIS_WIDTH));
+	mesh->SetPos(3,XMFLOAT3(0, AXIS_HEIGHT, 0));
+	mesh->SetPos(4,XMFLOAT3(0, 0, 0));
+	mesh->SetColor(0,XMFLOAT4(0, 0, 0,1));
+	mesh->SetColor(1,XMFLOAT4(1, 0, 0,1));
+	mesh->SetColor(2,XMFLOAT4(0, 1, 0,1));
+	mesh->SetColor(3,XMFLOAT4(0, 0, 1,1));
+	mesh->SetColor(4,XMFLOAT4(0, 0, 0,1));
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	mesh->Update(Device());
 	m_axisNX->SetShape(mesh);
 	m_axisNX->SetUnlit(true);
 
 	mesh = new LineMesh();
-	mesh->EmplaceBack(5);
-	mesh->GetVertex(0).Attr<VE_Position3D>() = XMFLOAT3(0, 0, AXIS_WIDTH);
-	mesh->GetVertex(1).Attr<VE_Position3D>() = XMFLOAT3(0, AXIS_HEIGHT, AXIS_WIDTH);
-	mesh->GetVertex(2).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, AXIS_WIDTH);
-	mesh->GetVertex(3).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, AXIS_WIDTH);
-	mesh->GetVertex(4).Attr<VE_Position3D>() = XMFLOAT3(0, 0, AXIS_WIDTH);
-	mesh->GetVertex(0).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
-	mesh->GetVertex(1).Attr<VE_Float4Color>() = XMFLOAT4(1, 0, 0,1);
-	mesh->GetVertex(2).Attr<VE_Float4Color>() = XMFLOAT4(0, 1, 0,1);
-	mesh->GetVertex(3).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 1,1);
-	mesh->GetVertex(4).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
+	mesh->Resize(5);
+	mesh->SetPos(0, XMFLOAT3(0, 0, AXIS_WIDTH));
+	mesh->SetPos(1, XMFLOAT3(0, AXIS_HEIGHT, AXIS_WIDTH));
+	mesh->SetPos(2, XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, AXIS_WIDTH));
+	mesh->SetPos(3, XMFLOAT3(AXIS_WIDTH, 0, AXIS_WIDTH));
+	mesh->SetPos(4, XMFLOAT3(0, 0, AXIS_WIDTH));
+	mesh->SetColor(0, XMFLOAT4(0, 0, 0,1));
+	mesh->SetColor(1, XMFLOAT4(1, 0, 0,1));
+	mesh->SetColor(2, XMFLOAT4(0, 1, 0,1));
+	mesh->SetColor(3, XMFLOAT4(0, 0, 1,1));
+	mesh->SetColor(4, XMFLOAT4(0, 0, 0,1));
 
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	mesh->Update(Device());
@@ -85,17 +85,17 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisPZ->SetUnlit(true);
 
 	mesh = new LineMesh();
-	mesh->EmplaceBack(5);
-	mesh->GetVertex(0).Attr<VE_Position3D>() = XMFLOAT3(0, 0, 0);
-	mesh->GetVertex(1).Attr<VE_Position3D>() = XMFLOAT3(0, AXIS_HEIGHT, 0);
-	mesh->GetVertex(2).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, 0);
-	mesh->GetVertex(3).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, 0);
-	mesh->GetVertex(4).Attr<VE_Position3D>() = XMFLOAT3(0, 0, 0);
-	mesh->GetVertex(0).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
-	mesh->GetVertex(1).Attr<VE_Float4Color>() = XMFLOAT4(1, 0, 0,1);
-	mesh->GetVertex(2).Attr<VE_Float4Color>() = XMFLOAT4(0, 1, 0,1);
-	mesh->GetVertex(3).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 1,1);
-	mesh->GetVertex(4).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
+	mesh->Resize(5);
+	mesh->SetPos(0,XMFLOAT3(0, 0, 0));
+	mesh->SetPos(1,XMFLOAT3(0, AXIS_HEIGHT, 0));
+	mesh->SetPos(2,XMFLOAT3(AXIS_WIDTH, AXIS_HEIGHT, 0));
+	mesh->SetPos(3,XMFLOAT3(AXIS_WIDTH, 0, 0));
+	mesh->SetPos(4,XMFLOAT3(0, 0, 0));
+	mesh->SetColor(0, XMFLOAT4(0, 0, 0,1));
+	mesh->SetColor(1, XMFLOAT4(1, 0, 0,1));
+	mesh->SetColor(2, XMFLOAT4(0, 1, 0,1));
+	mesh->SetColor(3, XMFLOAT4(0, 0, 1,1));
+	mesh->SetColor(4, XMFLOAT4(0, 0, 0,1));
 	
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	mesh->Update(Device());
@@ -103,17 +103,17 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisNZ->SetUnlit(true);
 
 	mesh = new LineMesh();
-	mesh->EmplaceBack(5);
-	mesh->GetVertex(0).Attr<VE_Position3D>() = XMFLOAT3(0, 0, 0);
-	mesh->GetVertex(1).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, 0);
-	mesh->GetVertex(2).Attr<VE_Position3D>() = XMFLOAT3(AXIS_WIDTH, 0, AXIS_WIDTH);
-	mesh->GetVertex(3).Attr<VE_Position3D>() = XMFLOAT3(0, 0, AXIS_WIDTH);
-	mesh->GetVertex(4).Attr<VE_Position3D>() = XMFLOAT3(0, 0, 0);
-	mesh->GetVertex(0).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
-	mesh->GetVertex(1).Attr<VE_Float4Color>() = XMFLOAT4(1, 0, 0,1);
-	mesh->GetVertex(2).Attr<VE_Float4Color>() = XMFLOAT4(0, 1, 0,1);
-	mesh->GetVertex(3).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 1,1);
-	mesh->GetVertex(4).Attr<VE_Float4Color>() = XMFLOAT4(0, 0, 0,1);
+	mesh->Resize(5);
+	mesh->SetPos(0,XMFLOAT3(0, 0, 0));
+	mesh->SetPos(1,XMFLOAT3(AXIS_WIDTH, 0, 0));
+	mesh->SetPos(2,XMFLOAT3(AXIS_WIDTH, 0, AXIS_WIDTH));
+	mesh->SetPos(3,XMFLOAT3(0, 0, AXIS_WIDTH));
+	mesh->SetPos(4,XMFLOAT3(0, 0, 0));
+	mesh->SetColor(0,XMFLOAT4(0, 0, 0,1));
+	mesh->SetColor(1,XMFLOAT4(1, 0, 0,1));
+	mesh->SetColor(2,XMFLOAT4(0, 1, 0,1));
+	mesh->SetColor(3,XMFLOAT4(0, 0, 1,1));
+	mesh->SetColor(4,XMFLOAT4(0, 0, 0,1));
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	mesh->Update(Device());
 	m_axisB->SetShape(mesh);
@@ -139,25 +139,17 @@ void DX::Plot3DGraphic::Scatter(std::vector<XMFLOAT3> pt, std::vector<float> rad
 		CreateActor(ActorKind::Object, &tmp);
 		m_scatters.push_back((Object*)tmp);
 
-		m_scatters.back()->SetShape(new SphereMesh(Device(), 1, D3DLayout_Std()));
+		m_scatters.back()->SetUnlit(true);
+		m_scatters.back()->SetShape(new SphereMesh(Device(), 1));
 		m_scatters.back()->GetTransform()->SetScale(rads[i]);
 		m_scatters.back()->GetTransform()->SetTranslation(pt[i]);
 		auto mesh = m_scatters.back()->GetShape();
 
 		for (int j = 0; j < mesh->Count(); ++j)
 		{
-			OutputDebugStringA(ToString(mesh->GetVertex(j).Attr<VE_Float4Color>()).c_str());
-			OutputDebugStringA("\n");
+			mesh->SetColor(j,colors[i]);
 		}
-		for (int j = 0; j < mesh->Count(); ++j)
-		{
-			mesh->GetVertex(j).Attr<VE_Float4Color>() = colors[i];
-		}
-		for (int j = 0; j < mesh->Count(); ++j)
-		{
-			OutputDebugStringA(ToString(mesh->GetVertex(j).Attr<VE_Float4Color>()).c_str());
-			OutputDebugStringA("\n");
-		}
+		mesh->Update(Device());
 	}
 }
 
@@ -209,12 +201,5 @@ void DX::Plot3DGraphic::UpdateCamMovement(float spf)
 	cam->transform->SetRot(f);
 
 
-	std::string str = 
-		"forward: " + ToString(cam->transform->GetForward())+
-		"up: " + ToString(cam->transform->GetUp()) +
-		"right: " + ToString(cam->transform->GetRight());
-
-	
-	((Text*)test)->SetStr(str);
 	
 }

@@ -4,179 +4,51 @@
 #include "Mesh.h"
 #include "ShaderFormat.h"
 #include "MathHelper.h"
-#include "Vertex.h"
+
 #include "Graphic.h"
 
 using namespace DX;
 
-
-VertexLayout::Element::Element(VertexElementType type, int offset)
-	:m_type(type), m_offset(offset)
+int DX::Mesh::Count() const
 {
-}
-int VertexLayout::Element::GetOffsetAfter()const
-{
-	return m_offset + Size();
-}
-int VertexLayout::Element::GetOffset()const
-{
-	return m_offset;
-}
-int VertexLayout::Element::Size() const
-{
-	return SizeOf(m_type);
+	return m_vertice.size();
 }
 
-int VertexLayout::Element::SizeOf(VertexElementType type)
+void DX::Mesh::Resize(int count)
 {
-	switch (type)
-	{
-	case VE_Position2D:
-		return sizeof(Map< VE_Position2D>::SysType);
-	case VE_Texture2D:
-		return sizeof(Map<VE_Texture2D>::SysType);
-	case VE_Position3D:
-		return sizeof(Map<VE_Position3D>::SysType);
-	case VE_Normal:
-		return sizeof(Map<VE_Normal>::SysType);
-	case VE_Float3Color:
-		return sizeof(Map<VE_Float3Color>::SysType);
-	case VE_Float4Color:
-		return sizeof(Map<VE_Float4Color>::SysType);
-	case VE_BGRAColor:
-		return sizeof(Map<VE_BGRAColor>::SysType);
-	}
-
-	assert("Wrong Element Type" && false);
+	m_vertice.resize(count);
 }
 
-VertexElementType VertexLayout::Element::GetType() const
+void DX::Mesh::SetVertex(int i, Vertex v)
 {
-	return m_type;
+	m_vertice[i] = v;
 }
 
-D3D11_INPUT_ELEMENT_DESC VertexLayout::Element::GetDesc() const
+void DX::Mesh::SetPos(int i, XMFLOAT3 pos)
 {
-	switch (m_type)
-	{
-	case VE_Position2D:
-		return GenerateDesc<VE_Position2D>(m_offset);
-	case VE_Position3D:
-		return GenerateDesc<VE_Position3D>(m_offset);
-	case VE_Texture2D:
-		return GenerateDesc<VE_Texture2D>(m_offset);
-	case VE_Normal:
-		return GenerateDesc<VE_Normal>(m_offset);
-	case VE_Float3Color:
-		return GenerateDesc<VE_Float3Color>(m_offset);
-	case VE_Float4Color:
-		return GenerateDesc<VE_Float4Color>(m_offset);
-	case VE_BGRAColor:
-		return GenerateDesc<VE_BGRAColor>(m_offset);
-	}
-
-	assert("wrong Element Type" && false);
+	m_vertice[i].pos = pos;
 }
 
-
-int VertexLayout::Count() const
+void DX::Mesh::SetColor(int i, XMFLOAT4 col)
 {
-	return m_elements.size();
+	m_vertice[i].color = col;
 }
 
-void VertexLayout::Clear()
+Vertex DX::Mesh::GetVertex(int i)
 {
-	m_elements.clear();
-}
-
-const VertexLayout::Element* VertexLayout::ResolveByIndex(unsigned int i)const
-{
-	return &m_elements[i];
-}
-VertexLayout& VertexLayout::Append(VertexElementType type)
-{
-	m_elements.emplace_back(type, Size());
-	return *this;
-}
-int VertexLayout::Size() const
-{
-	if (m_elements.empty())
-		return 0;
-
-	return m_elements.back().GetOffsetAfter();
-}
-std::vector<D3D11_INPUT_ELEMENT_DESC> VertexLayout::GetLayout() const
-{
-	std::vector<D3D11_INPUT_ELEMENT_DESC> descs;
-	for (const auto& elem : m_elements)
-	{
-		descs.push_back(elem.GetDesc());
-	}
-
-	return descs;
-}
-
-
-
-
-Vertex::Vertex(char* data, const VertexLayout& layout)
-	:m_data(data), m_layout(layout) {}
-
-const VertexLayout& Mesh::GetLayout() const
-{
-	return m_layout;
-}
-const char* Mesh::GetData() const
-{
-	return m_buffer.data();
-}
-int Mesh::SizeByte() const
-{
-	return m_buffer.size();
-}
-int Mesh::Count() const
-{
-	return m_buffer.size() / m_layout.Size();
-}
-
-void Mesh::EmplaceBack(int count)
-{
-	assert(m_layout.Count() > 0 && count > 0 && "layout is empty");
-
-	m_buffer.resize(m_buffer.size() + m_layout.Size() * count);
-}
-
-Vertex Mesh::Front()
-{
-	if (m_buffer.empty())
-		assert("VertexBuffer is empty" && false);
-
-	return Vertex(m_buffer.data(), m_layout);
-}
-Vertex Mesh::Back()
-{
-	if (m_buffer.empty())
-		assert("VertexBuffer is empty" && false);
-
-	return Vertex(m_buffer.data() + m_buffer.size() - m_layout.Size(), m_layout);
-}
-Vertex Mesh::GetVertex(int i)
-{
-	assert(i < Count());
-	return Vertex(m_buffer.data() + m_layout.Size() * i, m_layout);
+	return m_vertice[i];
 }
 
 void Mesh::Clear()
 {
-	m_buffer.clear();
+	m_vertice.clear();
 }
 
 
 Mesh::Mesh()
-	:m_indexBuffer(nullptr), m_vertexBuffer(nullptr), m_indice(nullptr), isNeedUpdate(false)
+	:m_indexBuffer(nullptr), m_vertexBuffer(nullptr), m_indice(nullptr)
 {
 	m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	m_layout = D3DLayout_Std();
 }
 
 
@@ -216,14 +88,11 @@ void Mesh::SetIndice(const int* indice, int indexCount)
 	int totalByte = sizeof(int) * indexCount;
 	m_indice = new int[totalByte];
 	memcpy(m_indice, indice, totalByte);
-	isNeedUpdate = true;
 
 }
 
 void Mesh::Update(ID3D11Device* device)
 {
-	if (isNeedUpdate)
-	{
 		if(m_vertexBuffer)
 			m_vertexBuffer->Release();
 
@@ -231,24 +100,24 @@ void Mesh::Update(ID3D11Device* device)
 		m_lMaxPt = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		for (int i = 0; i < Count(); ++i)
 		{
-			m_lMinPt.x = fminf(m_lMinPt.x, GetVertex(i).Attr<VE_Position3D>().x);
-			m_lMinPt.y = fminf(m_lMinPt.y, GetVertex(i).Attr<VE_Position3D>().y);
-			m_lMinPt.z = fminf(m_lMinPt.z, GetVertex(i).Attr<VE_Position3D>().z);
-			m_lMaxPt.x = fmaxf(m_lMaxPt.x, GetVertex(i).Attr<VE_Position3D>().x);
-			m_lMaxPt.y = fmaxf(m_lMaxPt.y, GetVertex(i).Attr<VE_Position3D>().y);
-			m_lMaxPt.z = fmaxf(m_lMaxPt.z, GetVertex(i).Attr<VE_Position3D>().z);
+			m_lMinPt.x = fminf(m_lMinPt.x, m_vertice[i].pos.x);
+			m_lMinPt.y = fminf(m_lMinPt.y, m_vertice[i].pos.y);
+			m_lMinPt.z = fminf(m_lMinPt.z, m_vertice[i].pos.z);
+			m_lMaxPt.x = fmaxf(m_lMaxPt.x, m_vertice[i].pos.x);
+			m_lMaxPt.y = fmaxf(m_lMaxPt.y, m_vertice[i].pos.y);
+			m_lMaxPt.z = fmaxf(m_lMaxPt.z, m_vertice[i].pos.z);
 		}
 
 		D3D11_BUFFER_DESC vb_desc;
 		ZeroMemory(&vb_desc, sizeof(D3D11_BUFFER_DESC));
 		vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 		vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vb_desc.ByteWidth = SizeByte();
+		vb_desc.ByteWidth = sizeof(Vertex)*m_vertice.size();
 		vb_desc.CPUAccessFlags = 0;
 		vb_desc.MiscFlags = 0;
 		vb_desc.StructureByteStride = 0;
 		D3D11_SUBRESOURCE_DATA vb_data;
-		vb_data.pSysMem = GetData();
+		vb_data.pSysMem = m_vertice.data();
 		HRESULT hr = device->CreateBuffer(
 			&vb_desc,
 			&vb_data,
@@ -269,8 +138,6 @@ void Mesh::Update(ID3D11Device* device)
 		hr = device->CreateBuffer(&ibd, &iinitData, &m_indexBuffer);
 		r_assert(hr);
 
-		isNeedUpdate = false;
-	}
 }
 
 
@@ -282,7 +149,7 @@ void Mesh::Apply(ID3D11DeviceContext* dContext)const
 
 	dContext->IASetPrimitiveTopology(m_primitiveType);
 	UINT offset = 0;
-	UINT verticeSize = GetLayout().Size();
+	UINT verticeSize = sizeof(Vertex);
 	dContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &verticeSize, &offset);
 	dContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 

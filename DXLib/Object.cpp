@@ -71,7 +71,7 @@ DX::Object::Object(Graphic* graphic)
 	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false)
 {
 	transform = new Transform();
-	auto layout = D3DLayout_Std().GetLayout();
+	auto layout = graphic->GetLayout();
 	vs = new VShader(graphic->Device(), "StdVS.cso", layout.data(), layout.size());
 	ps = new PShader(graphic->Device(), "StdPS.cso");
 

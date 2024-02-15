@@ -10,10 +10,12 @@ using namespace DX;
 
 PostProcessing::PostProcessing(ID3D11Device* device, std::string psPath)
 {
+	/*
 	auto stdDescs = D3DLayout_Std().GetLayout();
 
 	m_vs = new VShader(device, "HL_PP_StdVS.cso", stdDescs.data(), stdDescs.size());
 	m_ps = new PShader(device, psPath);
+	*/
 
 }
 

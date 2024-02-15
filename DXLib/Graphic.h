@@ -24,6 +24,8 @@ namespace DX
 		ID3D11RenderTargetView* RTV();
 		HWND GetHWND();
 
+		std::vector<D3D11_INPUT_ELEMENT_DESC> GetLayout();
+
 		void CreateActor(ActorKind kind, Actor** out);
 		std::unordered_map<ActorKind, std::vector<Actor*>> GetAllActors() const;
 		Actor* MainCamera() const;
@@ -52,6 +54,8 @@ namespace DX
 		ID3D11DepthStencilView* m_dsView;
 		ID3D11RasterizerState* m_rasterizerState;
 
+		std::vector<D3D11_INPUT_ELEMENT_DESC> m_vertLayout;
+
 		std::unordered_map<ActorKind, std::vector<Actor*>> m_actors;
 
 		Actor* m_mainCamera;
@@ -68,8 +72,6 @@ namespace DX
 	};
 
 
-	const DXLIB_DLL VertexLayout& D3DLayout_Simple();
-	const DXLIB_DLL VertexLayout& D3DLayout_Std();
 
 }
 
