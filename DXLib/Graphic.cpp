@@ -3,12 +3,15 @@
 #include "pch.h"
 
 #include "Graphic.h"
-#include "Math.h"
+#include "MathHelper.h"
 #include "Vertex.h"
 #include "Object.h"
 #include "Light.h"
 #include "Camera.h"
+#include "Text.h"
 #include "CubeMesh.h"
+#include "ShaderReg.h"
+#include "Transform.h"
 
 namespace DX {
 
@@ -16,7 +19,7 @@ namespace DX {
 	VertexLayout D3DVertLayout_Std;
 
 	Graphic::Graphic(HWND _hwnd, int msaa)
-		:m_mainCamera(nullptr)
+		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false)
 	{
 		assert(msaa == 1 || msaa == 2 || msaa == 4 || msaa == 8 || msaa == 16);
 
@@ -145,6 +148,23 @@ namespace DX {
 		m_dContext->RSSetState(m_rasterizerState);
 #pragma endregion
 
+#pragma region Sampler
+		D3D11_SAMPLER_DESC sampDesc;
+		ZeroMemory(&sampDesc, sizeof(D3D11_SAMPLER_DESC));
+		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+		FLOAT black[4] = { 0,0,0,1 };
+		sampDesc.BorderColor[0] = 0;
+		sampDesc.BorderColor[1] = 0;
+		sampDesc.BorderColor[2] = 0;
+		sampDesc.BorderColor[3] = 1;
+		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		ID3D11SamplerState* samp;
+		Device()->CreateSamplerState(&sampDesc, &samp);
+		DContext()->PSSetSamplers(SHADER_REG_SAMP_POINT, 1, &samp);
+		samp->Release();
+#pragma endregion
 
 		D3DVertLayout_Simple.Clear();
 		D3DVertLayout_Simple.Append(VE_Position3D);
@@ -154,7 +174,7 @@ namespace DX {
 			.Append(VE_Position3D)
 			.Append(VE_Texture2D)
 			.Append(VE_Normal)
-			.Append(VE_Float3Color);
+			.Append(VE_Float4Color);
 
 		
 	}
@@ -173,7 +193,7 @@ namespace DX {
 
 	}
 
-	void Graphic::Present()
+	void Graphic::Present(double spf)
 	{
 		for (auto it = m_actors.begin(); it!=m_actors.end(); ++it)
 		{
@@ -212,6 +232,11 @@ namespace DX {
 			
 
 		}
+
+
+		//camera movement
+		UpdateCamMovement(spf);
+
 
 
 		m_swapchain->Present(1, 0);
@@ -258,7 +283,7 @@ namespace DX {
 	{
 		switch (kind)
 		{
-		case DX::ActorKind::Object:
+		case ActorKind::Object:
 		{
 			Mesh* defaultMesh = new CubeMesh(m_device);
 
@@ -270,9 +295,9 @@ namespace DX {
 			*out = newObject;
 		}
 		break;
-		case DX::ActorKind::Camera:
+		case ActorKind::Camera:
 
-			*out = new Camera(FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, false);
+			*out = new Camera(this,FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, false);
 
 			if (!m_mainCamera)
 			{
@@ -280,16 +305,16 @@ namespace DX {
 			}
 
 			break;
-		case DX::ActorKind::Light_Direction:
+		case ActorKind::Light_Direction:
 
 			*out = new DirectionalLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
 				XMFLOAT3(0.8, 0.8, 0.8),
 				XMFLOAT3(0.7, 0.7, 0.7),
 				0.7f,
-				DX::Normalize(XMFLOAT3(0, -1, 0)));
+				Normalize(XMFLOAT3(0, -1, 0)));
 
 			break;
-		case DX::ActorKind::Light_Point:
+		case ActorKind::Light_Point:
 
 			*out = new PointLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
 				XMFLOAT3(0.8, 0.8, 0.8),
@@ -299,15 +324,21 @@ namespace DX {
 				XMFLOAT3(0, 0, 0));
 
 				break;
-		case DX::ActorKind::Light_Spot:
+		case ActorKind::Light_Spot:
 
 			*out = new DirectionalLight(this, 0, XMFLOAT3(0.25, 0.25, 0.25),
 				XMFLOAT3(0.8, 0.8, 0.8),
 				XMFLOAT3(0.7, 0.7, 0.7),
 				0.7f,
-				DX::Normalize(XMFLOAT3(1, 0, 0)));
+				Normalize(XMFLOAT3(1, 0, 0)));
 
 				break;
+
+		case ActorKind::Text:
+
+			*out = new Text(this);
+
+			break;
 		default:
 
 			assert(false && "unidentified actor kind");
@@ -330,6 +361,85 @@ namespace DX {
 	void Graphic::SetMainCamera(Actor* cam)
 	{
 		m_mainCamera = cam;
+	}
+
+	void Graphic::EnableCamMovement(bool enable)
+	{
+		m_enableCamMovement = enable;
+	}
+
+	void Graphic::KeyPress(char c, bool press)
+	{
+		if (press)
+		{
+			m_inputKeys.insert(c);
+		}
+		else
+		{
+			m_inputKeys.erase(c);
+		}
+	}
+
+	void Graphic::MouseLClick(bool click)
+	{
+		m_mouseLClicked = click;
+	}
+
+	void Graphic::MouseRClick(bool click)
+	{
+		m_mouseRClicked = click;
+	}
+
+	void Graphic::MousePT(float x, float y)
+	{
+		m_mouseX = x;
+		m_mouseY = y;
+	}
+
+	void Graphic::UpdateCamMovement(float spf)
+	{
+		if (m_mainCamera && m_enableCamMovement)
+		{
+			auto cam = (Camera*)m_mainCamera;
+			XMFLOAT3 newPos = cam->transform->GetPos();
+			XMFLOAT3 right = cam->transform->GetRight();
+			XMFLOAT3 forward = cam->transform->GetForward();
+			const float speed = 50;
+
+
+			if (m_inputKeys.find('A') != m_inputKeys.end()) {
+
+				newPos = XMFLOAT3(newPos.x - right.x * speed * spf, newPos.y - right.y * speed * spf, newPos.z - right.z * speed * spf);
+			}
+			else if (m_inputKeys.find('D') != m_inputKeys.end()) {
+
+				newPos = XMFLOAT3(newPos.x + right.x * speed * spf, newPos.y + right.y * speed * spf, newPos.z + right.z * speed * spf);
+			}
+			if (m_inputKeys.find('S') != m_inputKeys.end()) {
+
+				newPos = XMFLOAT3(newPos.x - forward.x * speed * spf, newPos.y - forward.y * speed * spf, newPos.z - forward.z * speed * spf);
+			}
+			else if (m_inputKeys.find('W') != m_inputKeys.end()) {
+
+				newPos = XMFLOAT3(newPos.x + forward.x * speed * spf, newPos.y + forward.y * speed * spf, newPos.z + forward.z * speed * spf);
+			}
+			static float angleX = 0;
+			static float angleY = 0;
+			static XMFLOAT2 prevMousePt;
+			const float angleSpeed = 3.141592f * 0.2f;
+			if (m_mouseRClicked)
+			{
+				angleY += angleSpeed * spf * (m_mouseX - prevMousePt.x);
+				angleX += angleSpeed * spf * (m_mouseY - prevMousePt.y);
+			}
+			prevMousePt.x = m_mouseX;
+			prevMousePt.y = m_mouseY;
+			const XMMATRIX rotMat = XMMatrixRotationX(angleX) * XMMatrixRotationY(angleY);
+			cam->transform->SetTranslation(newPos);
+			XMFLOAT3 f = DX::MultiplyDir(FORWARD, rotMat);
+			XMFLOAT3 u = DX::MultiplyDir(UP, rotMat);
+			cam->transform->SetRot(f, u);
+		}
 	}
 
 

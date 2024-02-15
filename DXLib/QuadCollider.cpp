@@ -2,7 +2,6 @@
 #include "pch.h"
 
 #include "QuadCollider.h"
-#include "Debugging.h"
 
 using namespace DX;
 

@@ -31,7 +31,7 @@ namespace DX
 	{
 	protected:
 		friend class Graphic;
-		Camera(FRAME_KIND frameKind, float screenWidth, float screenHeight, float nearPlane, float farPlane, float verticalViewRad, float aspectRatio, bool skipFrustum);
+		Camera(const Graphic* graphic, FRAME_KIND frameKind, float screenWidth, float screenHeight, float nearPlane, float farPlane, float verticalViewRad, float aspectRatio, bool skipFrustum);
 
 		
 
@@ -51,16 +51,16 @@ namespace DX
 
 	public:
 		~Camera();
-		void SetFrame(const FRAME_KIND fKind, XMFLOAT2 orthoSize, const float nearPlane, const float farPlane, const float verticalViewAngle, const float aspectRatio);
+		void SetFrame(const FRAME_KIND fKind, DirectX::XMFLOAT2 orthoSize, const float nearPlane, const float farPlane, const float verticalViewAngle, const float aspectRatio);
 		void Update() override;
-		void SetProj(XMMATRIX mat);
+		void SetProj(DirectX::XMMATRIX mat);
 
-		const XMMATRIX& VMat()const { return viewMat; }
-		const XMMATRIX& ProjMat()const { return projMat; }
-		void Pick(XMFLOAT2 scnPos, OUT Geometrics::Ray* ray)const;
+		const DirectX::XMMATRIX& VMat()const { return viewMat; }
+		const DirectX::XMMATRIX& ProjMat()const { return projMat; }
+		void Pick(DirectX::XMFLOAT2 scnPos, OUT Geometrics::Ray* ray)const;
 
 		FRAME_KIND GetFrame()const { return curFrame; }
-		XMFLOAT2 GetSize()const { return m_size; }
+		DirectX::XMFLOAT2 GetSize()const { return m_size; }
 		float GetN()const { return n; }
 		float GetF()const { return f; }
 		float GetVRad()const { return verticalRadian; }
@@ -72,16 +72,19 @@ namespace DX
 
 	private:
 		void SetView();
-		XMMATRIX projMat;
-		XMMATRIX viewMat;
+		DirectX::XMMATRIX projMat;
+		DirectX::XMMATRIX viewMat;
 
 		FRAME_KIND curFrame;
-		XMFLOAT2 m_size;
+		DirectX::XMFLOAT2 m_size;
 		float n, f;
 		float verticalRadian;
 		float aspectRatio;
 
 		Frustum frustum;
 		int layer = LAYER_ALL;
+
+
+		Buffer* m_cbPos;
 	};
 }

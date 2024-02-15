@@ -2,11 +2,11 @@
 #include "pch.h"
 #include "CylinderMesh.h"
 #include "ShaderFormat.h"
-#include "Math.h"
+#include "MathHelper.h"
 
 using namespace DX;
 
-CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLayout* layout)
+CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, VertexLayout layout)
 {
 	assert(sliceCount >= 3);
 
@@ -16,11 +16,9 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 	float hHeight = 0.5;
 	float rad = 0.5;
 
-	Vertice vertice(*layout);
-
-	const bool isPos3 = layout->Resolve<VE_Position3D>();
-	const bool isTex = layout->Resolve<VE_Texture2D>();
-	const bool isNorm = layout->Resolve<VE_Normal>();
+	const bool isPos3 = layout.Resolve<VE_Position3D>();
+	const bool isTex = layout.Resolve<VE_Texture2D>();
+	const bool isNorm = layout.Resolve<VE_Normal>();
 	
 	int vertCount = 0;
 	for (int i = 0; i < 2; ++i) {
@@ -28,20 +26,20 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 
 		for (int j = 0; j <= sliceCount; ++j) {
 
-			vertice.EmplaceBack();
+			EmplaceBack();
 
 			float c = cosf(j * dTheta);
 			float s = sinf(j * dTheta);
 
 			XMFLOAT3 tangent = XMFLOAT3(-s, 0, c);
-			XMFLOAT3 bitangent = -UP;
+			XMFLOAT3 bitangent = DOWN;
 
 			if(isPos3)
-				vertice[vertCount].Attr<VE_Position3D>() = XMFLOAT3(rad * c, y, rad * s);
+				GetVertex(vertCount).Attr<VE_Position3D>() = XMFLOAT3(rad * c, y, rad * s);
 			if(isTex)
-				vertice[vertCount].Attr<VE_Texture2D>() = XMFLOAT2(float(j) / sliceCount, 1.0f - i);
+				GetVertex(vertCount).Attr<VE_Texture2D>() = XMFLOAT2(float(j) / sliceCount, 1.0f - i);
 			if(isNorm)
-				vertice[vertCount].Attr<VE_Normal>() = Cross(tangent, bitangent);
+				GetVertex(vertCount).Attr<VE_Normal>() = Cross(tangent, bitangent);
 			
 			vertCount++;
 		}
@@ -62,10 +60,10 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 
 #pragma region cap
 	// top
-	int baseIdx = vertice.Count();
+	int baseIdx = Count();
 	for (int i = 0; i < sliceCount + 1; ++i)
 	{
-		vertice.EmplaceBack();
+		EmplaceBack();
 
 		float x = rad * cosf(i * dTheta);
 		float z = rad * sinf(i * dTheta);
@@ -73,25 +71,25 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 		float v = z / 1.5f;
 
 		if (isPos3)
-			vertice[vertCount].Attr<VE_Position3D>() = XMFLOAT3(x, hHeight, z);
+			GetVertex(vertCount).Attr<VE_Position3D>() = XMFLOAT3(x, hHeight, z);
 		if (isTex)
-			vertice[vertCount].Attr<VE_Texture2D>() = XMFLOAT2(u, v);
+			GetVertex(vertCount).Attr<VE_Texture2D>() = XMFLOAT2(u, v);
 		if (isNorm)
-			vertice[vertCount].Attr<VE_Normal>() = UP;
+			GetVertex(vertCount).Attr<VE_Normal>() = UP;
 
 		vertCount++;
 	}
 
-	vertice.EmplaceBack();
+	EmplaceBack();
 	if (isPos3)
-		vertice[vertCount].Attr<VE_Position3D>() = XMFLOAT3(0, hHeight, 0);
+		GetVertex(vertCount).Attr<VE_Position3D>() = XMFLOAT3(0, hHeight, 0);
 	if (isTex)
-		vertice[vertCount].Attr<VE_Texture2D>() = XMFLOAT2(0.5f, 0.5f);
+		GetVertex(vertCount).Attr<VE_Texture2D>() = XMFLOAT2(0.5f, 0.5f);
 	if (isNorm)
-		vertice[vertCount].Attr<VE_Normal>() = UP;
+		GetVertex(vertCount).Attr<VE_Normal>() = UP;
 	vertCount++;
 	
-	int centerIdx = vertice.Count();
+	int centerIdx = Count();
 	for (int i = 0; i < sliceCount; ++i)
 	{
 		indice.push_back(centerIdx-1);
@@ -100,10 +98,10 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 	}
 
 	//bottom
-	baseIdx = vertice.Count();
+	baseIdx = Count();
 	for (int i = 0; i < sliceCount + 1; ++i)
 	{
-		vertice.EmplaceBack();
+		EmplaceBack();
 
 		float x = rad * cosf(i * dTheta);
 		float z = rad * sinf(i * dTheta);
@@ -112,25 +110,25 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 
 
 		if (isPos3)
-			vertice[vertCount].Attr<VE_Position3D>() = XMFLOAT3(x, -hHeight, z);
+			GetVertex(vertCount).Attr<VE_Position3D>() = XMFLOAT3(x, -hHeight, z);
 		if (isTex)
-			vertice[vertCount].Attr<VE_Texture2D>() = XMFLOAT2(u, v);
+			GetVertex(vertCount).Attr<VE_Texture2D>() = XMFLOAT2(u, v);
 		if (isNorm)
-			vertice[vertCount].Attr<VE_Normal>() = -UP;
+			GetVertex(vertCount).Attr<VE_Normal>() = DOWN;
 		vertCount++;
 
 	}
 
-	vertice.EmplaceBack();
+	EmplaceBack();
 	if (isPos3)
-		vertice[vertCount].Attr<VE_Position3D>() = XMFLOAT3(0, -hHeight, 0);
+		GetVertex(vertCount).Attr<VE_Position3D>() = XMFLOAT3(0, -hHeight, 0);
 	if (isTex)
-		vertice[vertCount].Attr<VE_Texture2D>() = XMFLOAT2(0.5f, 0.5f);
+		GetVertex(vertCount).Attr<VE_Texture2D>() = XMFLOAT2(0.5f, 0.5f);
 	if (isNorm)
-		vertice[vertCount].Attr<VE_Normal>() = -UP;
+		GetVertex(vertCount).Attr<VE_Normal>() = DOWN;
 	vertCount++;
 	
-	centerIdx = vertice.Count();
+	centerIdx = Count();
 	for (int i = 0; i < sliceCount; ++i)
 	{
 		indice.push_back(centerIdx-1);
@@ -140,6 +138,6 @@ CylinderMesh::CylinderMesh(ID3D11Device* device, int sliceCount, const VertexLay
 #pragma endregion
 
 
-	SetVertice(&vertice, indice.data(), indice.size());
+	SetIndice(indice.data(), indice.size());
 	Update(device);
 }

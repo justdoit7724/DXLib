@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
 #include "Actor.h"
 
 
@@ -13,7 +14,7 @@ namespace DX
 		Graphic(HWND _hwnd, int msaa=1);
 		~Graphic();
 
-		void Present();
+		void Present(double spf);
 		void BindView();
 		ID3D11Device* Device() const ;
 		ID3D11DeviceContext* DContext() const ;
@@ -28,7 +29,14 @@ namespace DX
 		Actor* MainCamera() const;
 		void SetMainCamera(Actor* cam);
 
-	private:
+		//movement
+		void EnableCamMovement(bool enable);
+		void KeyPress(char c, bool press=true);
+		void MouseLClick(bool click = true);
+		void MouseRClick(bool click = true);
+		void MousePT(float x, float y);
+
+	protected:
 		Graphic() = delete;
 
 		HWND m_hwnd;
@@ -47,7 +55,16 @@ namespace DX
 		std::unordered_map<ActorKind, std::vector<Actor*>> m_actors;
 
 		Actor* m_mainCamera;
+		
+		
+		bool m_enableCamMovement;
+		std::unordered_set<char> m_inputKeys;
+		bool m_mouseLClicked;
+		bool m_mouseRClicked;
+		float m_mouseX;
+		float m_mouseY;
 
+		virtual void UpdateCamMovement(float spf);
 	};
 
 

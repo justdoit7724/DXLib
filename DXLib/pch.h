@@ -69,10 +69,22 @@ S
 #include <stack>
 #include <fstream>
 
+#define FORWARD XMFLOAT3(0,0,1)
+#define BACKWARD XMFLOAT3(0,0,-1)
+#define RIGHT XMFLOAT3(1,0,0)
+#define UP XMFLOAT3(0,1,0)
+#define DOWN XMFLOAT3(0,-1,0)
+
+
 using namespace DirectX;
 
 
 namespace DX {
+
+
+
+
+
 
 #define MB(s) \
 MessageBox(0,s,0,0);\
@@ -81,7 +93,83 @@ exit(-1);
 #define r_assert(r)	\
 assert(SUCCEEDED(r))
 
-	
+	inline std::string ToString(DirectX::XMFLOAT3 v)
+	{
+		std::string ret = "";
+
+		std::string x= std::to_string(v.x);
+		std::string y= std::to_string(v.y);
+		std::string z = std::to_string(v.z);
+		auto dot = x.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += x;
+		}
+		else
+			ret += x.substr(0, dot + 1 + 2);
+		ret += ", ";
+		dot = y.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += y;
+		}
+		else
+			ret += y.substr(0, dot + 1 + 2);
+		ret += ", ";
+		dot = z.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += z;
+		}
+		else
+			ret += z.substr(0, dot + 1 + 2);
+
+		return ret;
+	}
+
+	inline std::string ToString(DirectX::XMFLOAT4 v)
+	{
+		std::string ret = "";
+
+		std::string x = std::to_string(v.x);
+		std::string y = std::to_string(v.y);
+		std::string z = std::to_string(v.z);
+		std::string w = std::to_string(v.w);
+		auto dot = x.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += x;
+		}
+		else
+			ret += x.substr(0, dot + 1 + 2);
+		ret += ", ";
+		dot = y.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += y;
+		}
+		else
+			ret += y.substr(0, dot + 1 + 2);
+		ret += ", ";
+		dot = z.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += z;
+		}
+		else
+			ret += w.substr(0, dot + 1 + 2);
+		ret += ", ";
+		dot = w.find('.');
+		if (dot == std::string::npos)
+		{
+			ret += w;
+		}
+		else
+			ret += w.substr(0, dot + 1 + 2);
+
+
+		return ret;
+	}
 
 }
 

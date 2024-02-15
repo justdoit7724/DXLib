@@ -2,12 +2,15 @@
 #include "pch.h"
 #include "Camera.h"
 #include "Transform.h"
+#include "Graphic.h"
+#include "Buffer.h"
+#include "ShaderReg.h"
 
 #define Z_ORDER_MAX 5
 using namespace DX;
 
-Camera::Camera(FRAME_KIND frameKind, float orthoScnWidth, float orthoScnHeight, float n, float f, float verticalViewRad, float aspectRatio, bool skipFrustum)
-	:Actor(nullptr, ActorKind::Camera)
+Camera::Camera(const Graphic* graphic, FRAME_KIND frameKind, float orthoScnWidth, float orthoScnHeight, float n, float f, float verticalViewRad, float aspectRatio, bool skipFrustum)
+	:Actor(graphic, ActorKind::Camera)
 {
 	transform = new Transform();
 
@@ -15,9 +18,12 @@ Camera::Camera(FRAME_KIND frameKind, float orthoScnWidth, float orthoScnHeight, 
 	SetFrame(frameKind, XMFLOAT2(orthoScnWidth, orthoScnHeight), n, f, verticalViewRad, aspectRatio);
 
 	frustum.skip = skipFrustum;
+
+	m_cbPos = new Buffer(graphic->Device(), sizeof(XMFLOAT4));
 }
 Camera::~Camera()
 {
+	delete m_cbPos;
 	delete transform;
 }
 void Camera::SetFrame(const FRAME_KIND fKind, XMFLOAT2 orthoSize, const float n, const float f, const float verticalViewRad, const float aspectRatio)
@@ -96,23 +102,30 @@ void Camera::Update()
 
 		float tri = tan(verticalRadian * 0.5f);
 		XMFLOAT3 trDir = Normalize(
-			right * tri * f * aspectRatio +
-			up * tri * f +
-			forward * f);
+			Add({ Mul(right, tri * f * aspectRatio),
+			Mul(up, tri * f),
+			Mul(forward, f) }));
 		XMFLOAT3 blDir = Normalize(
-			-right * tri * f * aspectRatio +
-			-up * tri * f +
-			forward * f);
+			Add({Mul(Neg(right), tri * f * aspectRatio) ,
+			Mul(Neg(up), tri * f),
+			Mul(forward, f)}));
 
-		frustum.front = Geometrics::PlaneInf(p + forward * f, -forward);
-		frustum.back = Geometrics::PlaneInf(p + forward * n, forward);
+		frustum.front = Geometrics::PlaneInf(Add({ p, Mul(forward, f) }), Neg(forward));
+		frustum.back = Geometrics::PlaneInf(Add({ p, Mul(forward, n) }), forward);
 		frustum.left = Geometrics::PlaneInf(p, Cross(up, blDir));
-		frustum.right = Geometrics::PlaneInf(p, Cross(-up, trDir));
+		frustum.right = Geometrics::PlaneInf(p, Cross(Neg(up), trDir));
 		frustum.top = Geometrics::PlaneInf(p, Cross(right, trDir));
 		frustum.bottom = Geometrics::PlaneInf(p, Cross(blDir, right));
 	}
 
 	SetView();
+
+
+	XMFLOAT3 pos = transform->GetPos();
+	m_cbPos->Write(m_graphic->DContext(), &pos);
+	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_EYE, 1, m_cbPos->GetAddress());
+
+
 }
 void Camera::Pick(XMFLOAT2 scnPos, OUT Geometrics::Ray* ray)const
 {
@@ -157,7 +170,7 @@ void Camera::Pick(XMFLOAT2 scnPos, OUT Geometrics::Ray* ray)const
 			1);
 		vDir = Normalize(vPos);
 
-		ray->o = eye + right * vPos.x + up * vPos.y;
+		ray->o = Add({ eye, Mul(right, vPos.x) , Mul(up, vPos.y) });
 
 		ray->d = forward;
 	}

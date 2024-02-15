@@ -7,14 +7,14 @@ namespace DX {
 	{
 	public:
 		QuadCollider();
-		QuadCollider(XMFLOAT3 pos);
+		QuadCollider(DirectX::XMFLOAT3 pos);
 
 		void Visualize() override;
-		bool IsHit(Geometrics::Ray ray, XMFLOAT3* hitPt) override;
-		void SetScale(XMFLOAT3 s) override;
+		bool IsHit(Geometrics::Ray ray, DirectX::XMFLOAT3* hitPt) override;
+		void SetScale(DirectX::XMFLOAT3 s) override;
 	private:
 
-		XMFLOAT2 extent;
+		DirectX::XMFLOAT2 extent;
 
 	};
 }

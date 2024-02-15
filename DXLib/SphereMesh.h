@@ -10,7 +10,7 @@ namespace DX {
 		public Mesh
 	{
 	public:
-		SphereMesh(ID3D11Device* device, const int numSubDivision, const VertexLayout* layout);
+		SphereMesh(ID3D11Device* device, const int numSubDivision, VertexLayout layout);
 	};
 }
 

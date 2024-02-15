@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "Transform.h"
-#include "Math.h"
+#include "MathHelper.h"
 
 using namespace DX;
 
@@ -42,8 +42,8 @@ XMMATRIX Transform::T()const
 void DX::Transform::SetRot(XMFLOAT3 _forward)
 {
 	forward = _forward;
-	XMFLOAT3 tempUP = (forward == UP) ? -FORWARD : UP;
-	right = Cross(tempUP, forward);
+	XMFLOAT3 tempUP = Equal(forward, UP) ? BACKWARD : UP;
+	right = Normalize(Cross(tempUP, forward));
 	up = Cross(forward, right);
 }
 

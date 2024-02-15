@@ -9,7 +9,7 @@ namespace DX {
 		public Mesh
 	{
 	public:
-		QuadMesh(ID3D11Device* device, const VertexLayout* layout);
+		QuadMesh(ID3D11Device* device, VertexLayout layout);
 	};
 }
 

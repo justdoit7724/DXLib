@@ -11,7 +11,6 @@
 #include "DepthStencilState.h"
 #include "RasterizerState.h"
 #include "Mesh.h"
-#include "Debugging.h"
 #include "LayerMask.h"
 #include "Collider.h"
 #include "Graphic.h"
@@ -120,7 +119,7 @@ void Object::UpdateBound()
 	XMFLOAT3 wMinPt = Multiply(boundlMinPt, world);
 	XMFLOAT3 wMaxPt = Multiply(boundlMaxPt, world);
 	bound.p = transform->GetPos();
-	bound.rad = Length(wMinPt - wMaxPt) * 0.5f;
+	bound.rad = Length(Sub(wMinPt, wMaxPt)) * 0.5f;
 }
 
 void Object::UpdateCollider()

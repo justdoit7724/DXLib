@@ -7,9 +7,23 @@ using namespace DX;
 Text::Text(const Graphic* graphic)
 	:Actor(graphic, ActorKind::Text)
 {
-	m_spriteFont = std::make_unique<DirectX::SpriteFont>(graphic->Device(), L"DirectXTK\\Font\\Font.spritefont");
+	try
+	{
 
-	m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphic->DContext());
+		m_spriteFont = new SpriteFont(graphic->Device(), __FILE__ L"\\..\\DirectXTK\\Font\\Font.spritefont");
+
+		m_spriteBatch = new SpriteBatch(graphic->DContext());
+	}
+	catch (const std::exception& e)
+	{
+		std::string error = e.what();
+		MessageBoxA(nullptr, error.c_str(), "exception", MB_OK);
+	}
+
+	m_x = 0;
+	m_y = 0;
+	m_scaleX = 1;
+	m_scaleY = 1;
 }
 
 void Text::SetStr(std::string str)
@@ -41,7 +55,7 @@ void Text::Render()
 	m_spriteBatch->Begin();
 
 	m_spriteFont->DrawString(
-		m_spriteBatch.get(),
+		m_spriteBatch,
 		m_str.c_str(),
 		XMFLOAT2(m_x, m_y),
 		XMVectorSet(m_colR, m_colG, m_colB,0),

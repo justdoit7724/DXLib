@@ -2,7 +2,6 @@
 #include "pch.h"
 
 #include "SphereCollider.h"
-#include "Debugging.h"
 
 using namespace DX;
 

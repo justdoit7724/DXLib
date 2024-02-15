@@ -6,7 +6,7 @@
 
 namespace DX
 {
-    class Text :
+    class DXLIB_DLL Text :
         public Actor
     {
     public:
@@ -29,8 +29,8 @@ namespace DX
         float m_scaleX;
         float m_scaleY;
 
-        std::unique_ptr<SpriteFont> m_spriteFont;
-        std::unique_ptr<SpriteBatch> m_spriteBatch;
+        DirectX::SpriteFont* m_spriteFont;
+        DirectX::SpriteBatch* m_spriteBatch;
 
     };
 }

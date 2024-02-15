@@ -2,7 +2,7 @@
 #include "CubeMesh.h"
 
 #include "ShaderFormat.h"
-#include "Math.h"
+#include "MathHelper.h"
 #include "Graphic.h"
 
 using namespace DX;
@@ -28,95 +28,93 @@ DX::CubeMesh::CubeMesh(ID3D11Device* device)
 {
 	auto layout = D3DLayout_Std();
 
-	Vertice OBJ_CUBE(layout);
-	
 	for (int i = 0; i < 30; ++i)
 	{
-		OBJ_CUBE.EmplaceBack();
+		EmplaceBack();
 	}
 	if (layout.Resolve<VE_Position3D>())
 	{
-		OBJ_CUBE[0].Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
-		OBJ_CUBE[1].Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
-		OBJ_CUBE[2].Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
-		OBJ_CUBE[3].Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
-		OBJ_CUBE[4].Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
-		OBJ_CUBE[5].Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
-		OBJ_CUBE[6].Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
-		OBJ_CUBE[7].Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
-		OBJ_CUBE[8].Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
-		OBJ_CUBE[9].Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
-		OBJ_CUBE[10].Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
-		OBJ_CUBE[11].Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
-		OBJ_CUBE[12].Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
-		OBJ_CUBE[13].Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
-		OBJ_CUBE[14].Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
-		OBJ_CUBE[15].Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
-		OBJ_CUBE[16].Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
-		OBJ_CUBE[17].Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
-		OBJ_CUBE[18].Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
-		OBJ_CUBE[19].Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
-		OBJ_CUBE[20].Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
-		OBJ_CUBE[21].Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
-		OBJ_CUBE[22].Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
-		OBJ_CUBE[23].Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
+		GetVertex(0).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
+		GetVertex(1).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
+		GetVertex(2).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
+		GetVertex(3).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
+		GetVertex(4).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
+		GetVertex(5).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
+		GetVertex(6).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
+		GetVertex(7).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
+		GetVertex(8).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
+		GetVertex(9).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
+		GetVertex(10).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
+		GetVertex(11).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
+		GetVertex(12).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
+		GetVertex(13).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
+		GetVertex(14).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
+		GetVertex(15).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
+		GetVertex(16).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, -0.5);
+		GetVertex(17).Attr< VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0.5);
+		GetVertex(18).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0.5);
+		GetVertex(19).Attr< VE_Position3D>() = XMFLOAT3(0.5, 0.5, -0.5);
+		GetVertex(20).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0.5);
+		GetVertex(21).Attr< VE_Position3D>() = XMFLOAT3(-0.5, -0.5, -0.5);
+		GetVertex(22).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, -0.5);
+		GetVertex(23).Attr< VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0.5);
 		
 	}
 	if (layout.Resolve<VE_Texture2D>())
 	{
-		OBJ_CUBE[0].Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		OBJ_CUBE[1].Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_CUBE[2].Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_CUBE[3].Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		OBJ_CUBE[4].Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		OBJ_CUBE[5].Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_CUBE[6].Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_CUBE[7].Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		OBJ_CUBE[8].Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		OBJ_CUBE[9].Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_CUBE[10].Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_CUBE[11].Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		OBJ_CUBE[12].Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		OBJ_CUBE[13].Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_CUBE[14].Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_CUBE[15].Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		OBJ_CUBE[16].Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		OBJ_CUBE[17].Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_CUBE[18].Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_CUBE[19].Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
-		OBJ_CUBE[20].Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
-		OBJ_CUBE[21].Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_CUBE[22].Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_CUBE[23].Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(0).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(1).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(2).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(3).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(4).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(5).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(6).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(7).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(8).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(9).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(10).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(11).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(12).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(13).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(14).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(15).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(16).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(17).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(18).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(19).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(20).Attr< VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(21).Attr< VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(22).Attr< VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(23).Attr< VE_Texture2D>() = XMFLOAT2(1, 1);
 	}
 	if (layout.Resolve<VE_Normal>())
 	{
-		OBJ_CUBE[0].Attr< VE_Normal>() = -FORWARD;
-		OBJ_CUBE[1].Attr< VE_Normal>() = -FORWARD;
-		OBJ_CUBE[2].Attr< VE_Normal>() = -FORWARD;
-		OBJ_CUBE[3].Attr< VE_Normal>() = -FORWARD;
-		OBJ_CUBE[4].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[5].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[6].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[7].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[8].Attr< VE_Normal>() = FORWARD;
-		OBJ_CUBE[9].Attr< VE_Normal>() = FORWARD;
-		OBJ_CUBE[10].Attr< VE_Normal>() = FORWARD;
-		OBJ_CUBE[11].Attr< VE_Normal>() = FORWARD;
-		OBJ_CUBE[12].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[13].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[14].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[15].Attr< VE_Normal>() = RIGHT;
-		OBJ_CUBE[16].Attr< VE_Normal>() = UP;
-		OBJ_CUBE[17].Attr< VE_Normal>() = UP;
-		OBJ_CUBE[18].Attr< VE_Normal>() = UP;
-		OBJ_CUBE[19].Attr< VE_Normal>() = UP;
-		OBJ_CUBE[20].Attr< VE_Normal>() = -UP;
-		OBJ_CUBE[21].Attr< VE_Normal>() = -UP;
-		OBJ_CUBE[22].Attr< VE_Normal>() = -UP;
-		OBJ_CUBE[23].Attr< VE_Normal>() = -UP;
+		GetVertex(0).Attr< VE_Normal>() = BACKWARD;
+		GetVertex(1).Attr< VE_Normal>() = BACKWARD;
+		GetVertex(2).Attr< VE_Normal>() = BACKWARD;
+		GetVertex(3).Attr< VE_Normal>() = BACKWARD;
+		GetVertex(4).Attr< VE_Normal>() = RIGHT;
+		GetVertex(5).Attr< VE_Normal>() = RIGHT;
+		GetVertex(6).Attr< VE_Normal>() = RIGHT;
+		GetVertex(7).Attr< VE_Normal>() = RIGHT;
+		GetVertex(8).Attr< VE_Normal>() = FORWARD;
+		GetVertex(9).Attr< VE_Normal>() = FORWARD;
+		GetVertex(10).Attr< VE_Normal>() = FORWARD;
+		GetVertex(11).Attr< VE_Normal>() = FORWARD;
+		GetVertex(12).Attr< VE_Normal>() = RIGHT;
+		GetVertex(13).Attr< VE_Normal>() = RIGHT;
+		GetVertex(14).Attr< VE_Normal>() = RIGHT;
+		GetVertex(15).Attr< VE_Normal>() = RIGHT;
+		GetVertex(16).Attr< VE_Normal>() = UP;
+		GetVertex(17).Attr< VE_Normal>() = UP;
+		GetVertex(18).Attr< VE_Normal>() = UP;
+		GetVertex(19).Attr< VE_Normal>() = UP;
+		GetVertex(20).Attr< VE_Normal>() = DOWN;
+		GetVertex(21).Attr< VE_Normal>() = DOWN;
+		GetVertex(22).Attr< VE_Normal>() = DOWN;
+		GetVertex(23).Attr< VE_Normal>() = DOWN;
 	}
 	
-	SetVertice(&OBJ_CUBE, OBJ_CUBE_INDICE, INDEX_COUNT);
+	SetIndice(OBJ_CUBE_INDICE, INDEX_COUNT);
 	Update(device);
 }

@@ -20,7 +20,7 @@ struct PS_INPUT
     float4 pPos : TEXCOORD2;
     float3 normal : TEXCOORD3;
     float2 tex : TEXCOORD4;
-    float3 color : TEXCOORD5;
+    float4 color : TEXCOORD5;
     //float3 tangent : TEXCOORD4;
 };
 float4 main(PS_INPUT input) : SV_Target
@@ -50,5 +50,5 @@ float4 main(PS_INPUT input) : SV_Target
 
     float4 litCol = float4(spec + ambient + diffuse, mDiffuse.w);
 
-    return Lerp(litCol, float4(input.color, 1), isUnlit.x);
+    return Lerp(litCol, input.color, isUnlit.x);
 }

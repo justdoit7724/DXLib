@@ -11,8 +11,8 @@ namespace DX {
 	public:
 		LineMesh();
 
-		void Add(XMFLOAT3 a, XMFLOAT3 b);
-		void Generate(ID3D11Device* device, const VertexLayout* layout);
+		void Add(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
+		void Generate(ID3D11Device* device, VertexLayout layout);
 		void Clear();
 		void Apply(ID3D11DeviceContext* dContext) const override;
 
@@ -22,7 +22,7 @@ namespace DX {
 
 		struct LineInfo
 		{
-			XMFLOAT3 a, b;
+			DirectX::XMFLOAT3 a, b;
 		};
 
 		std::vector<LineInfo> lines;

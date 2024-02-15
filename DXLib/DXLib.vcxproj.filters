@@ -57,9 +57,6 @@
     <ClInclude Include="CylinderMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Debugging.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DepthStencilState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -123,7 +120,7 @@
     <ClInclude Include="DXLibExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
+    <ClInclude Include="MathHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CubeMesh.h">
@@ -197,9 +194,6 @@
     <ClCompile Include="CylinderMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debugging.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DepthStencilState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -233,7 +227,7 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Math.cpp">
+    <ClCompile Include="MathHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CubeMesh.cpp">
@@ -271,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometrics.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

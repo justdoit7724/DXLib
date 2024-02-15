@@ -3,39 +3,34 @@
 
 #include "QuadMesh.h"
 #include "ShaderFormat.h"
-#include "Math.h"
+#include "MathHelper.h"
 #include "Vertex.h"
 
 using namespace DX;
 
-QuadMesh::QuadMesh(ID3D11Device* device, const VertexLayout* layout)
+QuadMesh::QuadMesh(ID3D11Device* device, VertexLayout layout)
 	: Mesh()
 {
+	EmplaceBack(4);
 
-	Vertice OBJ_QUAD(*layout);
-	OBJ_QUAD.EmplaceBack();
-	OBJ_QUAD.EmplaceBack();
-	OBJ_QUAD.EmplaceBack();
-	OBJ_QUAD.EmplaceBack();
+	GetVertex(0).Attr<VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0);
+	GetVertex(1).Attr<VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0);
+	GetVertex(2).Attr<VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0);
+	GetVertex(3).Attr<VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0);
 
-	OBJ_QUAD[0].Attr<VE_Position3D>() = XMFLOAT3(-0.5, -0.5, 0);
-	OBJ_QUAD[1].Attr<VE_Position3D>() = XMFLOAT3(-0.5, 0.5, 0);
-	OBJ_QUAD[2].Attr<VE_Position3D>() = XMFLOAT3(0.5, 0.5, 0);
-	OBJ_QUAD[3].Attr<VE_Position3D>() = XMFLOAT3(0.5, -0.5, 0);
-
-	if (layout->Resolve<VE_Texture2D>())
+	if (layout.Resolve<VE_Texture2D>())
 	{
-		OBJ_QUAD[0].Attr<VE_Texture2D>() = XMFLOAT2(1, 1);
-		OBJ_QUAD[1].Attr<VE_Texture2D>() = XMFLOAT2(1, 0);
-		OBJ_QUAD[2].Attr<VE_Texture2D>() = XMFLOAT2(0, 0);
-		OBJ_QUAD[3].Attr<VE_Texture2D>() = XMFLOAT2(0, 1);
+		GetVertex(0).Attr<VE_Texture2D>() = XMFLOAT2(1, 1);
+		GetVertex(1).Attr<VE_Texture2D>() = XMFLOAT2(1, 0);
+		GetVertex(2).Attr<VE_Texture2D>() = XMFLOAT2(0, 0);
+		GetVertex(3).Attr<VE_Texture2D>() = XMFLOAT2(0, 1);
 	}
-	if (layout->Resolve<VE_Normal>())
+	if (layout.Resolve<VE_Normal>())
 	{
-		OBJ_QUAD[0].Attr<VE_Normal>() = FORWARD;
-		OBJ_QUAD[1].Attr<VE_Normal>() = FORWARD;
-		OBJ_QUAD[2].Attr<VE_Normal>() = FORWARD;
-		OBJ_QUAD[3].Attr<VE_Normal>() = FORWARD;
+		GetVertex(0).Attr<VE_Normal>() = FORWARD;
+		GetVertex(1).Attr<VE_Normal>() = FORWARD;
+		GetVertex(2).Attr<VE_Normal>() = FORWARD;
+		GetVertex(3).Attr<VE_Normal>() = FORWARD;
 	}
 	
 	const int INDEX_COUNT = 6;
@@ -46,7 +41,7 @@ QuadMesh::QuadMesh(ID3D11Device* device, const VertexLayout* layout)
 	};
 
 
-	SetVertice(&OBJ_QUAD, OBJ_QUAD_INDICE, INDEX_COUNT);
+	SetIndice(OBJ_QUAD_INDICE, INDEX_COUNT);
 	Update(device);
 }
 

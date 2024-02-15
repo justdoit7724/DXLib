@@ -3,7 +3,7 @@
 
 #include "SphereMesh.h"
 #include "ShaderFormat.h"
-#include "Math.h"
+#include "MathHelper.h"
 
 using namespace DX;
 
@@ -20,9 +20,9 @@ inline void Subdivide(std::vector<XMFLOAT3>& vertice, std::vector<int>& indice)
 		XMFLOAT3 v2 = tempVertice[tempIndice[i + 1]];
 		XMFLOAT3 v3 = tempVertice[tempIndice[i + 2]];
 
-		XMFLOAT3 nv1 = Normalize((v1 + v3) * 2);
-		XMFLOAT3 nv2 = Normalize((v1 + v2) * 2);
-		XMFLOAT3 nv3 = Normalize((v3 + v2) * 2);
+		XMFLOAT3 nv1 = Normalize(Mul(Add({ v1, v3 }), 2));
+		XMFLOAT3 nv2 = Normalize(Mul(Add({ v1, v2 }), 2));
+		XMFLOAT3 nv3 = Normalize(Mul(Add({ v3, v2 }), 2));
 
 
 		// compute 3 new vertices by spliting half on each edge
@@ -48,7 +48,7 @@ inline void Subdivide(std::vector<XMFLOAT3>& vertice, std::vector<int>& indice)
 	}
 }
 
-SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, const VertexLayout* layout)
+SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, VertexLayout layout)
 	:Mesh()
 {
 	// Put a cap on the number of subdivisions. 
@@ -93,14 +93,13 @@ SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, const VertexLay
 		Subdivide(vertice, indice);
 	// Project vertices onto sphere and scale. 
 
-	const bool isTex = layout->Resolve<VE_Texture2D>();
-	const bool isNorm = layout->Resolve<VE_Normal>();
+	const bool isTex = layout.Resolve<VE_Texture2D>();
+	const bool isNorm = layout.Resolve<VE_Normal>();
 
 	/**/
-	Vertice vertice2(*layout);
 	for (size_t i = 0; i < vertice.size(); ++i) {
 		
-		vertice2.EmplaceBack();
+		EmplaceBack();
 
 		XMFLOAT3 pos = vertice[i];
 		XMFLOAT3 n = Normalize(pos);
@@ -116,21 +115,21 @@ SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision, const VertexLay
 			-sinf(theta)
 		);*/
 
-		vertice2[i].Attr<VE_Position3D>() = pos/2.0;
+		GetVertex(i).Attr<VE_Position3D>() = Div(pos,2.0);
 
 		if (isTex)
 		{
-			vertice2[i].Attr<VE_Texture2D>() = tex;
+			GetVertex(i).Attr<VE_Texture2D>() = tex;
 		}
 		if (isNorm)
 		{
-			vertice2[i].Attr<VE_Normal>() = n;
+			GetVertex(i).Attr<VE_Normal>() = n;
 		}
 	}
 
 	int* indiceData = indice.data();
 
-	SetVertice(&vertice2, indiceData, indice.size());
+	SetIndice(indiceData, indice.size());
 	Update(device);
 }
 
