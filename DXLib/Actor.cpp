@@ -4,12 +4,18 @@
 using namespace DX;
 
 Actor::Actor(const Graphic* graphic, ActorKind kind)
-	:m_graphic(graphic), isRelease(false), m_kind(kind)
+	:m_graphic(graphic), m_isRelease(false), m_kind(kind), m_enable(true)
 {
 	
 }
 
+
 void Actor::Release()
 {
-	isRelease = true;
+	m_isRelease = true;
+}
+
+void DX::Actor::SetEnable(bool enable)
+{
+	m_enable = enable;
 }

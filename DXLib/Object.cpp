@@ -100,7 +100,7 @@ Object::~Object()
 
 void Object::Update()
 {
-	if (!enabled)
+	if (!m_enable)
 		return;
 
 	UpdateBound();
@@ -189,7 +189,7 @@ void Object::Visualize()
 void Object::Render()
 {
 
-	if (!enabled || !show)
+	if (!m_enable)
 		return;
 
 	Camera* curCam = (Camera*)m_graphic->MainCamera();
@@ -203,14 +203,14 @@ void Object::Render()
 		const SHADER_STD_TRANSF STransformation(transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
 		vs->WriteCB(m_graphic->DContext(), 0, &STransformation);
 
-		vs->Apply(m_graphic->DContext());
-		ps->Apply(m_graphic->DContext());
+		vs->Apply(m_graphic);
+		ps->Apply(m_graphic);
 
-		dsState->Apply(m_graphic->DContext());
-		blendState->Apply(m_graphic->DContext());
-		rsState->Apply(m_graphic->DContext());
+		dsState->Apply(m_graphic);
+		blendState->Apply(m_graphic);
+		rsState->Apply(m_graphic);
 
-		m_mesh->Apply(m_graphic->DContext());
+		m_mesh->Apply(m_graphic);
 	}
 
 }

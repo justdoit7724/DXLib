@@ -17,24 +17,32 @@ int DX::Mesh::Count() const
 void DX::Mesh::Resize(int count)
 {
 	m_vertice.resize(count);
+
+	m_updated = false;
 }
 
 void DX::Mesh::SetVertex(int i, Vertex v)
 {
 	m_vertice[i] = v;
+
+	m_updated = false;
 }
 
 void DX::Mesh::SetPos(int i, XMFLOAT3 pos)
 {
 	m_vertice[i].pos = pos;
+
+	m_updated = false;
 }
 
 void DX::Mesh::SetColor(int i, XMFLOAT4 col)
 {
 	m_vertice[i].color = col;
+
+	m_updated = false;
 }
 
-Vertex DX::Mesh::GetVertex(int i)
+Vertex DX::Mesh::GetVertex(int i) const
 {
 	return m_vertice[i];
 }
@@ -42,13 +50,25 @@ Vertex DX::Mesh::GetVertex(int i)
 void Mesh::Clear()
 {
 	m_vertice.clear();
+
+	m_updated = false;
 }
 
 
 Mesh::Mesh()
-	:m_indexBuffer(nullptr), m_vertexBuffer(nullptr), m_indice(nullptr)
+	:m_indexBuffer(nullptr), m_vertexBuffer(nullptr), m_indice(nullptr), m_updated(false)
 {
 	m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+}
+
+Mesh::Mesh(const Mesh* other)
+{
+	m_vertice = other->m_vertice;
+	m_lMinPt = other->m_lMinPt;
+	m_lMaxPt = other->m_lMaxPt;
+	SetIndice(other->m_indice, other->m_indexCount);
+	m_primitiveType = other->m_primitiveType;
+	m_updated = false;
 }
 
 
@@ -89,12 +109,24 @@ void Mesh::SetIndice(const int* indice, int indexCount)
 	m_indice = new int[totalByte];
 	memcpy(m_indice, indice, totalByte);
 
+	m_updated = false;
 }
 
 void Mesh::Update(ID3D11Device* device)
 {
-		if(m_vertexBuffer)
-			m_vertexBuffer->Release();
+	if (m_updated)
+		return;
+	m_updated = true;
+
+	if (m_vertexBuffer)
+		m_vertexBuffer->Release();
+	m_vertexBuffer = nullptr;
+	if (m_indexBuffer)
+		m_indexBuffer->Release();
+	m_indexBuffer = nullptr;
+
+	if (m_vertice.size())
+	{
 
 		m_lMinPt = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 		m_lMaxPt = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -112,7 +144,7 @@ void Mesh::Update(ID3D11Device* device)
 		ZeroMemory(&vb_desc, sizeof(D3D11_BUFFER_DESC));
 		vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 		vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vb_desc.ByteWidth = sizeof(Vertex)*m_vertice.size();
+		vb_desc.ByteWidth = sizeof(Vertex) * m_vertice.size();
 		vb_desc.CPUAccessFlags = 0;
 		vb_desc.MiscFlags = 0;
 		vb_desc.StructureByteStride = 0;
@@ -124,8 +156,6 @@ void Mesh::Update(ID3D11Device* device)
 			&m_vertexBuffer);
 		r_assert(hr);
 
-		if(m_indexBuffer)
-			m_indexBuffer->Release();
 		D3D11_BUFFER_DESC ibd;
 		ibd.Usage = D3D11_USAGE_IMMUTABLE;
 		ibd.ByteWidth = sizeof(UINT) * m_indexCount;
@@ -137,22 +167,25 @@ void Mesh::Update(ID3D11Device* device)
 		iinitData.pSysMem = m_indice;
 		hr = device->CreateBuffer(&ibd, &iinitData, &m_indexBuffer);
 		r_assert(hr);
-
+	}
 }
 
 
 
 
 
-void Mesh::Apply(ID3D11DeviceContext* dContext)const
+void Mesh::Apply(const Graphic* graphic)
 {
+	Update(graphic->Device());
 
-	dContext->IASetPrimitiveTopology(m_primitiveType);
-	UINT offset = 0;
-	UINT verticeSize = sizeof(Vertex);
-	dContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &verticeSize, &offset);
-	dContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	if (m_vertexBuffer && m_indexBuffer)
+	{
+		graphic->DContext()->IASetPrimitiveTopology(m_primitiveType);
+		UINT offset = 0;
+		UINT verticeSize = sizeof(Vertex);
+		graphic->DContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &verticeSize, &offset);
+		graphic->DContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	dContext->DrawIndexed(m_indexCount, 0, 0);
-
+		graphic->DContext()->DrawIndexed(m_indexCount, 0, 0);
+	}
 }

@@ -61,7 +61,7 @@ namespace DX {
 		VShader(ID3D11Device* device, std::string fileName, const D3D11_INPUT_ELEMENT_DESC* layoutDesc, UINT layoutNum);
 		~VShader();
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 		void UnboundSRVAll(ID3D11DeviceContext* dContext)const override;
 
 	private:
@@ -75,7 +75,7 @@ namespace DX {
 		GShader(ID3D11Device* device, std::string fileName = "");
 		~GShader();
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 		void UnboundSRVAll(ID3D11DeviceContext* dContext)const override;
 	private:
 		ID3D11GeometryShader* gs = nullptr;
@@ -87,7 +87,7 @@ namespace DX {
 		HShader(ID3D11Device* device, std::string fileName = "");
 		~HShader();
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 		void UnboundSRVAll(ID3D11DeviceContext* dContext)const override;
 	private:
 		ID3D11HullShader* hs = nullptr;
@@ -98,7 +98,7 @@ namespace DX {
 		DShader(ID3D11Device* device, std::string fileName = "");
 		~DShader();
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 		void UnboundSRVAll(ID3D11DeviceContext* dContext)const override;
 	private:
 		ID3D11DomainShader* ds = nullptr;
@@ -111,7 +111,7 @@ namespace DX {
 		PShader(ID3D11Device* device, std::string fileName = "");
 		~PShader();
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 		void UnboundSRVAll(ID3D11DeviceContext* dContext)const override;
 
 	private:
@@ -125,7 +125,7 @@ namespace DX {
 		CShader(ID3D11Device* device, const std::string CSfileName);
 		~CShader();
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 		void UnboundSRVAll(ID3D11DeviceContext* dContext)const override;
 
 	private:

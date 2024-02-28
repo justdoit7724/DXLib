@@ -20,14 +20,17 @@ namespace DX {
 		friend class Graphic;
 
 		Actor(const Graphic* graphic, ActorKind kind);
+		virtual ~Actor() {}
 
-		bool isRelease;
+		bool m_isRelease;
+		bool m_enable;
 		
 	public:
 		virtual void Update() {}
 		virtual void Render() {}
 
 		void Release();
+		void SetEnable(bool enable);
 		const ActorKind m_kind;
 	};
 }

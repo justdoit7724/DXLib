@@ -43,9 +43,9 @@ void DepthStencilState::Modify(ID3D11Device* device, D3D11_DEPTH_STENCIL_DESC * 
 	r_assert(hr);
 }
 
-void DepthStencilState::Apply(ID3D11DeviceContext* dContext) const
+void DepthStencilState::Apply(const Graphic* graphic)
 {
-	dContext->OMSetDepthStencilState(state, refValue);
+	graphic->DContext()->OMSetDepthStencilState(state, refValue);
 }
 
 void DepthStencilState::SetRefValue(UINT v)

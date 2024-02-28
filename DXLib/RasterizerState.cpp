@@ -28,7 +28,7 @@ RasterizerState::~RasterizerState()
 {
 	state->Release();
 }
-void RasterizerState::Apply(ID3D11DeviceContext* dContext)const
+void RasterizerState::Apply(const Graphic* graphic)
 {
-	dContext->RSSetState(state);
+	graphic->DContext()->RSSetState(state);
 }

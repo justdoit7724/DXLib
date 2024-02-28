@@ -186,7 +186,7 @@ namespace DX {
 
 	}
 
-	void Graphic::Present(double spf)
+	void Graphic::Update(float spf)
 	{
 		for (auto it = m_actors.begin(); it!=m_actors.end(); ++it)
 		{
@@ -199,7 +199,7 @@ namespace DX {
 			for (int i = 0; i < it->second.size();)
 			{
 				Actor* curActor = it->second[i];
-				if (curActor->isRelease)
+				if (curActor->m_isRelease)
 				{
 					if (curActor == m_mainCamera)
 					{
@@ -234,7 +234,7 @@ namespace DX {
 
 		m_swapchain->Present(1, 0);
 
-		const float black[4] = { 0.3,0.3,0.3,1 };
+		const float black[4] = { 1,1,1,0 };
 		m_dContext->ClearRenderTargetView(m_rtv, black);
 		m_dContext->ClearDepthStencilView(m_dsView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
@@ -267,7 +267,7 @@ namespace DX {
 		return m_rtv;
 	}
 
-	HWND Graphic::GetHWND()
+	HWND Graphic::GetHWND()const
 	{
 		return m_hwnd;
 	}

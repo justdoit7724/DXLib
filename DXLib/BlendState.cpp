@@ -42,9 +42,9 @@ void BlendState::Modify(ID3D11Device* device, D3D11_BLEND_DESC * desc)
 	r_assert(hr);
 }
 
-void BlendState::Apply(ID3D11DeviceContext* dContext) const
+void BlendState::Apply(const Graphic* graphic) 
 {
 	float blendFactors[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	dContext->OMSetBlendState(state, blendFactors, 0xffffffff);
+	graphic->DContext()->OMSetBlendState(state, blendFactors, 0xffffffff);
 }
 

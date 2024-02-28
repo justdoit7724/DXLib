@@ -23,22 +23,22 @@ PostProcessing::~PostProcessing()
 {
 }
 
-void PostProcessing::Render(ID3D11DeviceContext* dContext, ID3D11RenderTargetView* rtv)
+void PostProcessing::Render(const Graphic* graphic, ID3D11RenderTargetView* rtv)
 {
 	if (!rtv)
 	{
-		dContext->OMGetRenderTargets(1, &rtv, nullptr);
+		graphic->DContext()->OMGetRenderTargets(1, &rtv, nullptr);
 	}
 
 	ID3D11RenderTargetView* dxRTVTmp;
 	ID3D11DepthStencilView* dxDSTemp;
-	dContext->OMGetRenderTargets(1, &dxRTVTmp, &dxDSTemp);
+	graphic->DContext()->OMGetRenderTargets(1, &dxRTVTmp, &dxDSTemp);
 
-	dContext->OMSetRenderTargets(1, &rtv, nullptr);
+	graphic->DContext()->OMSetRenderTargets(1, &rtv, nullptr);
 
-	m_vs->Apply(dContext);
-	m_ps->Apply(dContext);
-	m_screenMesh->Apply(dContext);
+	m_vs->Apply(graphic);
+	m_ps->Apply(graphic);
+	m_screenMesh->Apply(graphic);
 
-	dContext->OMSetRenderTargets(1, &dxRTVTmp, dxDSTemp);
+	graphic->DContext()->OMSetRenderTargets(1, &dxRTVTmp, dxDSTemp);
 }

@@ -9,7 +9,7 @@ using namespace DX;
 
 LineMesh::LineMesh()
 {
-	m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+	m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 }
 
 

@@ -10,7 +10,7 @@ namespace DX
 		~BlendState();
 
 		void Modify(ID3D11Device* device, D3D11_BLEND_DESC* desc);
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 
 
 	private:

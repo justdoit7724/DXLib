@@ -143,14 +143,14 @@ VShader::~VShader()
 }
 
 
-void VShader::Apply(ID3D11DeviceContext* dContext)const
+void VShader::Apply(const Graphic* graphic)
 {
-	dContext->IASetInputLayout(iLayout);
-	dContext->VSSetShader(vs, nullptr, 0);
+	graphic->DContext()->IASetInputLayout(iLayout);
+	graphic->DContext()->VSSetShader(vs, nullptr, 0);
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		dContext->VSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		graphic->DContext()->VSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -158,7 +158,7 @@ void VShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11ShaderResourceView* srv = i->second.data;
 
-		dContext->VSSetShaderResources(slot, arrayNum, &srv);
+		graphic->DContext()->VSSetShaderResources(slot, arrayNum, &srv);
 	}
 	for (auto i = samps.begin(); i != samps.end(); ++i)
 	{
@@ -166,7 +166,7 @@ void VShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11SamplerState* samp = i->second.data;
 
-		dContext->VSSetSamplers(slot, arrayNum, &samp);
+		graphic->DContext()->VSSetSamplers(slot, arrayNum, &samp);
 	}
 }
 
@@ -206,15 +206,15 @@ GShader::~GShader()
 		gs->Release();
 }
 
-void GShader::Apply(ID3D11DeviceContext* dContext)const
+void GShader::Apply(const Graphic* graphic)
 {
 	if (gs)
 	{
-		dContext->GSSetShader(gs, nullptr, 0);
+		graphic->DContext()->GSSetShader(gs, nullptr, 0);
 
 		for (auto i = cbs.begin(); i != cbs.end(); ++i)
 		{
-			dContext->GSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+			graphic->DContext()->GSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
 		}
 		for (auto i = srvs.begin(); i != srvs.end(); ++i)
 		{
@@ -222,7 +222,7 @@ void GShader::Apply(ID3D11DeviceContext* dContext)const
 			UINT arrayNum = i->second.arrayNum;
 			ID3D11ShaderResourceView* srv = i->second.data;
 
-			dContext->GSSetShaderResources(slot, arrayNum, &srv);
+			graphic->DContext()->GSSetShaderResources(slot, arrayNum, &srv);
 		}
 		for (auto i = samps.begin(); i != samps.end(); ++i)
 		{
@@ -230,12 +230,12 @@ void GShader::Apply(ID3D11DeviceContext* dContext)const
 			UINT arrayNum = i->second.arrayNum;
 			ID3D11SamplerState* samp = i->second.data;
 
-			dContext->GSSetSamplers(slot, arrayNum, &samp);
+			graphic->DContext()->GSSetSamplers(slot, arrayNum, &samp);
 		}
 	}
 	else
 	{
-		dContext->GSSetShader(nullptr, nullptr, 0);
+		graphic->DContext()->GSSetShader(nullptr, nullptr, 0);
 	}
 }
 
@@ -272,13 +272,13 @@ PShader::~PShader()
 	if(ps)
 		ps->Release();
 }
-void PShader::Apply(ID3D11DeviceContext* dContext)const
+void PShader::Apply(const Graphic* graphic)
 {
-	dContext->PSSetShader(ps, nullptr, 0);
+	graphic->DContext()->PSSetShader(ps, nullptr, 0);
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		dContext->PSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		graphic->DContext()->PSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -286,7 +286,7 @@ void PShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11ShaderResourceView* srv = i->second.data;
 
-		dContext->PSSetShaderResources(slot, arrayNum, &srv);
+		graphic->DContext()->PSSetShaderResources(slot, arrayNum, &srv);
 	}
 	for (auto i = samps.begin(); i != samps.end(); ++i)
 	{
@@ -294,7 +294,7 @@ void PShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11SamplerState* samp = i->second.data;
 
-		dContext->PSSetSamplers(slot, arrayNum, &samp);
+		graphic->DContext()->PSSetSamplers(slot, arrayNum, &samp);
 	}
 }
 
@@ -331,13 +331,13 @@ CShader::~CShader()
 		cs->Release();
 }
 
-void CShader::Apply(ID3D11DeviceContext* dContext)const
+void CShader::Apply(const Graphic* graphic)
 {
-	dContext->CSSetShader(cs, nullptr, 0);
+	graphic->DContext()->CSSetShader(cs, nullptr, 0);
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		dContext->CSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		graphic->DContext()->CSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -345,7 +345,7 @@ void CShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11ShaderResourceView* srv = i->second.data;
 
-		dContext->CSSetShaderResources(slot, arrayNum, &srv);
+		graphic->DContext()->CSSetShaderResources(slot, arrayNum, &srv);
 	}
 	for (auto i = samps.begin(); i != samps.end(); ++i)
 	{
@@ -353,7 +353,7 @@ void CShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11SamplerState* samp = i->second.data;
 
-		dContext->CSSetSamplers(slot, arrayNum, &samp);
+		graphic->DContext()->CSSetSamplers(slot, arrayNum, &samp);
 	}
 }
 
@@ -393,13 +393,13 @@ HShader::~HShader()
 		hs->Release();
 }
 
-void HShader::Apply(ID3D11DeviceContext* dContext)const
+void HShader::Apply(const Graphic* graphic)
 {
-	dContext->HSSetShader(hs, nullptr, 0);
+	graphic->DContext()->HSSetShader(hs, nullptr, 0);
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		dContext->HSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		graphic->DContext()->HSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -407,7 +407,7 @@ void HShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11ShaderResourceView* srv = i->second.data;
 
-		dContext->HSSetShaderResources(slot, arrayNum, &srv);
+		graphic->DContext()->HSSetShaderResources(slot, arrayNum, &srv);
 	}
 	for (auto i = samps.begin(); i != samps.end(); ++i)
 	{
@@ -415,7 +415,7 @@ void HShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11SamplerState* samp = i->second.data;
 
-		dContext->HSSetSamplers(slot, arrayNum, &samp);
+		graphic->DContext()->HSSetSamplers(slot, arrayNum, &samp);
 	}
 }
 
@@ -456,13 +456,13 @@ DShader::~DShader()
 		ds->Release();
 }
 
-void DShader::Apply(ID3D11DeviceContext* dContext)const
+void DShader::Apply(const Graphic* graphic)
 {
-	dContext->DSSetShader(ds, nullptr, 0);
+	graphic->DContext()->DSSetShader(ds, nullptr, 0);
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		dContext->DSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		graphic->DContext()->DSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -470,7 +470,7 @@ void DShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11ShaderResourceView* srv = i->second.data;
 
-		dContext->DSSetShaderResources(slot, arrayNum, &srv);
+		graphic->DContext()->DSSetShaderResources(slot, arrayNum, &srv);
 	}
 	for (auto i = samps.begin(); i != samps.end(); ++i)
 	{
@@ -478,7 +478,7 @@ void DShader::Apply(ID3D11DeviceContext* dContext)const
 		UINT arrayNum = i->second.arrayNum;
 		ID3D11SamplerState* samp = i->second.data;
 
-		dContext->DSSetSamplers(slot, arrayNum, &samp);
+		graphic->DContext()->DSSetSamplers(slot, arrayNum, &samp);
 	}
 }
 

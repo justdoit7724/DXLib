@@ -21,6 +21,7 @@ namespace DX {
 	{
 	public:
 		Mesh();
+		Mesh(const Mesh* other);
 		~Mesh();
 
 		void GetLBound(OUT DirectX::XMFLOAT3* minPt, OUT DirectX::XMFLOAT3* maxPt);
@@ -28,10 +29,9 @@ namespace DX {
 
 		void SetIndice(const int* indice, int indexCount);
 
-		void Update(ID3D11Device* device);
 
 
-		void Apply(ID3D11DeviceContext* dContext)const override;
+		void Apply(const Graphic* graphic) override;
 
 
 		int Count() const;
@@ -39,11 +39,12 @@ namespace DX {
 		void SetVertex(int i, Vertex v);
 		void SetPos(int i, XMFLOAT3 pos);
 		void SetColor(int i, XMFLOAT4 col);
-		Vertex GetVertex(int i);
+		Vertex GetVertex(int i) const;
 		void Clear();
 
 	protected:
 
+		void Update(ID3D11Device* device);
 		void SetPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY p) { m_primitiveType = p; }
 
 		DirectX::XMFLOAT3 m_lMinPt, m_lMaxPt;
@@ -56,6 +57,8 @@ namespace DX {
 		int m_indexCount;
 
 		std::vector<Vertex> m_vertice;
+
+		bool m_updated;
 
 
 	};

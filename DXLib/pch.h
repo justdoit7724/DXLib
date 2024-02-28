@@ -72,9 +72,12 @@ S
 #define FORWARD XMFLOAT3(0,0,1)
 #define BACKWARD XMFLOAT3(0,0,-1)
 #define RIGHT XMFLOAT3(1,0,0)
+#define LEFT XMFLOAT3(-1,0,0)
 #define UP XMFLOAT3(0,1,0)
 #define DOWN XMFLOAT3(0,-1,0)
 
+
+#define DARK_GRAY XMFLOAT4(0.2,0.2,0.2,1)
 
 using namespace DirectX;
 
@@ -92,6 +95,21 @@ exit(-1);
 
 #define r_assert(r)	\
 assert(SUCCEEDED(r))
+
+	inline std::string ToString(float f, int fracCount=2)
+	{
+
+		std::string ret = std::to_string(f);
+		auto dot = ret.find('.');
+		if (fracCount == 0)
+		{
+			return ret.substr(0, dot);
+		}
+		if (dot != std::string::npos)
+			return ret.substr(0, dot + 1 + fracCount);
+
+		return ret;
+	}
 
 	inline std::string ToString(DirectX::XMFLOAT3 v)
 	{

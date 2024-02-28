@@ -128,6 +128,10 @@ namespace DX {
 	{
 		return { -a.x, -a.y , -a.z};
 	}
+	XMFLOAT4 Div(XMFLOAT4 a, float v)
+	{
+		return {a.x/v, a.y/v,a.z/v, a.w/v};
+	}
 	float Clamp(float a, float b, float v)
 	{
 		return fmaxf(a, fminf(v, b));

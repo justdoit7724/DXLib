@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Graphic.h"
 
 namespace DX
 {
@@ -9,7 +9,7 @@ namespace DX
 		Component();
 
 	protected:
-		virtual void Apply(ID3D11DeviceContext* dContext)const = 0;
+		virtual void Apply(const Graphic* graphic) = 0;
 	};
 }
 

@@ -9,6 +9,7 @@ namespace DX
 	class BlendState;
 	class DepthStencilState;
 	class RasterizerState;
+	class Graphic;
 
 	class PostProcessing
 	{
@@ -16,7 +17,7 @@ namespace DX
 		PostProcessing(ID3D11Device* device, std::string psPath);
 		~PostProcessing();
 
-		void Render(ID3D11DeviceContext* dContext, ID3D11RenderTargetView* rtv=nullptr);
+		void Render(const Graphic* graphic, ID3D11RenderTargetView* rtv=nullptr);
 
 	private:
 

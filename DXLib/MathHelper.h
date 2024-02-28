@@ -175,6 +175,7 @@ namespace DX {
 	DirectX::XMFLOAT3 DXLIB_DLL Mul(DirectX::XMFLOAT3 a, float v);
 	bool DXLIB_DLL Equal(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
 	DirectX::XMFLOAT3 DXLIB_DLL Neg(DirectX::XMFLOAT3 a);
+	DirectX::XMFLOAT4 DXLIB_DLL Div(DirectX::XMFLOAT4 a, float v);
 	
 	
 

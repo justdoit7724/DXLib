@@ -12,9 +12,9 @@ namespace DX
 	{
 	public:
 		Graphic(HWND _hwnd, int msaa=1);
-		~Graphic();
+		virtual ~Graphic();
 
-		void Present(double spf);
+		virtual void Update(float spf);
 		void BindView();
 		ID3D11Device* Device() const ;
 		ID3D11DeviceContext* DContext() const ;
@@ -22,7 +22,7 @@ namespace DX
 		ID3D11Texture2D* BackBuffer();
 		ID3D11DepthStencilView* DSV();
 		ID3D11RenderTargetView* RTV();
-		HWND GetHWND();
+		HWND GetHWND() const;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> GetLayout();
 

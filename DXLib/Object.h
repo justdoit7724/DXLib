@@ -70,16 +70,9 @@ namespace DX {
 
 		virtual bool IsInsideFrustum(const Frustum* frustum) const;
 
-		bool enabled = true;
-		bool show = true;
 		int layer;
 
 		Geometrics::Sphere bound;
-
-	public:
-		void SetEnabled(bool e) { enabled = e; }
-		void SetShow(bool s) { show = s; }
-
 
 
 
