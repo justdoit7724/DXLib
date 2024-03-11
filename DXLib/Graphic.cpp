@@ -272,6 +272,13 @@ namespace DX {
 		return m_hwnd;
 	}
 
+	RECT Graphic::GetWndSize() const
+	{
+		RECT rc;
+		GetWindowRect(m_hwnd, &rc);
+		return rc;
+	}
+
 	std::vector<D3D11_INPUT_ELEMENT_DESC> Graphic::GetLayout()
 	{
 		return m_vertLayout;
@@ -295,7 +302,7 @@ namespace DX {
 		break;
 		case ActorKind::Camera:
 
-			*out = new Camera(this,FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, false);
+			*out = new Camera(this,FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, true);
 
 			if (!m_mainCamera)
 			{

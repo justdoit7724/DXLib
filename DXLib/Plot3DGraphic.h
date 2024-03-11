@@ -1,6 +1,5 @@
 #pragma once
 #include "Graphic.h"
-#include <DirectXMath.h>
 
 namespace DX
 {

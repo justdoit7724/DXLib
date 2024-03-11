@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <unordered_set>
+#include <DirectXMath.h>
 #include "Actor.h"
 
 
@@ -23,6 +24,7 @@ namespace DX
 		ID3D11DepthStencilView* DSV();
 		ID3D11RenderTargetView* RTV();
 		HWND GetHWND() const;
+		RECT GetWndSize() const;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> GetLayout();
 

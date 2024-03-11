@@ -48,17 +48,17 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	mesh->SetPos(8, XMFLOAT3(2 * AXIS_WIDTH / 4, AXIS_HEIGHT, 0));
 	mesh->SetPos(9, XMFLOAT3(3 * AXIS_WIDTH / 4, 0, 0));
 	mesh->SetPos(10, XMFLOAT3(3 * AXIS_WIDTH / 4, AXIS_HEIGHT, 0));
-	mesh->SetColor(0, DARK_GRAY);
-	mesh->SetColor(1, DARK_GRAY);
-	mesh->SetColor(2, DARK_GRAY);
-	mesh->SetColor(3, DARK_GRAY);
-	mesh->SetColor(4, DARK_GRAY);
-	mesh->SetColor(5, DARK_GRAY);
-	mesh->SetColor(6, DARK_GRAY);
-	mesh->SetColor(7, DARK_GRAY);
-	mesh->SetColor(8, DARK_GRAY);
-	mesh->SetColor(9, DARK_GRAY);
-	mesh->SetColor(10, DARK_GRAY);
+	mesh->SetColor(0, COLOR_DARK_GRAY);
+	mesh->SetColor(1, COLOR_DARK_GRAY);
+	mesh->SetColor(2, COLOR_DARK_GRAY);
+	mesh->SetColor(3, COLOR_DARK_GRAY);
+	mesh->SetColor(4, COLOR_DARK_GRAY);
+	mesh->SetColor(5, COLOR_DARK_GRAY);
+	mesh->SetColor(6, COLOR_DARK_GRAY);
+	mesh->SetColor(7, COLOR_DARK_GRAY);
+	mesh->SetColor(8, COLOR_DARK_GRAY);
+	mesh->SetColor(9, COLOR_DARK_GRAY);
+	mesh->SetColor(10, COLOR_DARK_GRAY);
 	std::vector<int> indiceR = { 0,1, 1,2, 2,3, 3,4,4,0, 5,6,7,8,9,10 };
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	m_axisPX->GetTransform()->SetTranslation(AXIS_WIDTH, 0, 0);
@@ -103,26 +103,26 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	mesh->SetPos(17, XMFLOAT3(3 * AXIS_WIDTH / 4, 0, AXIS_WIDTH));
 	mesh->SetPos(18, XMFLOAT3(4 * AXIS_WIDTH / 4, 0, 0));
 	mesh->SetPos(19, XMFLOAT3(4 * AXIS_WIDTH / 4, 0, AXIS_WIDTH));
-	mesh->SetColor(0, DARK_GRAY);
-	mesh->SetColor(1, DARK_GRAY);
-	mesh->SetColor(2, DARK_GRAY);
-	mesh->SetColor(3, DARK_GRAY);
-	mesh->SetColor(4, DARK_GRAY);
-	mesh->SetColor(5, DARK_GRAY);
-	mesh->SetColor(6, DARK_GRAY);
-	mesh->SetColor(7, DARK_GRAY);
-	mesh->SetColor(8, DARK_GRAY);
-	mesh->SetColor(9, DARK_GRAY);
-	mesh->SetColor(10, DARK_GRAY);
-	mesh->SetColor(11, DARK_GRAY);
-	mesh->SetColor(12, DARK_GRAY);
-	mesh->SetColor(13, DARK_GRAY);
-	mesh->SetColor(14, DARK_GRAY);
-	mesh->SetColor(15, DARK_GRAY);
-	mesh->SetColor(16, DARK_GRAY);
-	mesh->SetColor(17, DARK_GRAY);
-	mesh->SetColor(18, DARK_GRAY);
-	mesh->SetColor(19, DARK_GRAY);
+	mesh->SetColor(0, COLOR_DARK_GRAY);
+	mesh->SetColor(1, COLOR_DARK_GRAY);
+	mesh->SetColor(2, COLOR_DARK_GRAY);
+	mesh->SetColor(3, COLOR_DARK_GRAY);
+	mesh->SetColor(4, COLOR_DARK_GRAY);
+	mesh->SetColor(5, COLOR_DARK_GRAY);
+	mesh->SetColor(6, COLOR_DARK_GRAY);
+	mesh->SetColor(7, COLOR_DARK_GRAY);
+	mesh->SetColor(8, COLOR_DARK_GRAY);
+	mesh->SetColor(9, COLOR_DARK_GRAY);
+	mesh->SetColor(10, COLOR_DARK_GRAY);
+	mesh->SetColor(11, COLOR_DARK_GRAY);
+	mesh->SetColor(12, COLOR_DARK_GRAY);
+	mesh->SetColor(13, COLOR_DARK_GRAY);
+	mesh->SetColor(14, COLOR_DARK_GRAY);
+	mesh->SetColor(15, COLOR_DARK_GRAY);
+	mesh->SetColor(16, COLOR_DARK_GRAY);
+	mesh->SetColor(17, COLOR_DARK_GRAY);
+	mesh->SetColor(18, COLOR_DARK_GRAY);
+	mesh->SetColor(19, COLOR_DARK_GRAY);
 	indiceR.clear();
 	for (int i = 0; i < 10; ++i)
 	{
@@ -133,7 +133,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisB->SetShape(mesh);
 	m_axisB->SetUnlit(true);
 
-	float unitSpacing = AXIS_WIDTH / 30;
+	float unitSpacing = AXIS_WIDTH / 35;
 	for (int i = 0; i < 5; ++i)
 	{
 		CreateActor(ActorKind::Text, &tmp);

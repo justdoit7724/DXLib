@@ -76,8 +76,10 @@ S
 #define UP XMFLOAT3(0,1,0)
 #define DOWN XMFLOAT3(0,-1,0)
 
-
-#define DARK_GRAY XMFLOAT4(0.2,0.2,0.2,1)
+#define COLOR_RED XMFLOAT4(1.0,0.0,0.0,1.0)
+#define COLOR_GREEN XMFLOAT4(0.0,1.0,0.0,1.0)
+#define COLOR_BLUE XMFLOAT4(0.0,0.0,1.0,1.0)
+#define COLOR_DARK_GRAY XMFLOAT4(0.2,0.2,0.2,1.0)
 
 using namespace DirectX;
 
