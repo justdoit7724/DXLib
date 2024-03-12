@@ -36,15 +36,6 @@ namespace DX {
 		return DirectX::XMFLOAT2(v.x / f, v.y / f);
 	}
 
-	DirectX::XMFLOAT3 operator+(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b)
-	{
-		DirectX::XMFLOAT3 sum;
-		sum.x = a.x + b.x;
-		sum.y = a.y + b.y;
-		sum.z = a.z + b.z;
-		return sum;
-	}
-
 	void operator+=(DirectX::XMFLOAT3& a, DirectX::XMFLOAT3 b)
 	{
 		a.x += b.x;
@@ -88,14 +79,6 @@ namespace DX {
 		return sum;
 	}
 
-	DirectX::XMFLOAT3 operator*(DirectX::XMFLOAT3 v, float f)
-	{
-		DirectX::XMFLOAT3 sum;
-		sum.x = v.x * f;
-		sum.y = v.y * f;
-		sum.z = v.z * f;
-		return sum;
-	}
 
 	DirectX::XMFLOAT3 operator*(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b)
 	{
@@ -167,12 +150,9 @@ namespace DX {
 	DirectX::XMFLOAT2 DXLIB_DLL Mul(DirectX::XMFLOAT2 a, float v);
 	DirectX::XMFLOAT2 DXLIB_DLL Neg(DirectX::XMFLOAT2 a);
 	bool DXLIB_DLL Equal(DirectX::XMFLOAT2 a, DirectX::XMFLOAT2 b);
-	DirectX::XMFLOAT3 DXLIB_DLL Add(std::vector<DirectX::XMFLOAT3> a);
-	DirectX::XMFLOAT3 DXLIB_DLL Sub(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
 	DirectX::XMFLOAT3 DXLIB_DLL Add(DirectX::XMFLOAT3 a, float v);
 	DirectX::XMFLOAT3 DXLIB_DLL Sub(DirectX::XMFLOAT3 a, float v);
 	DirectX::XMFLOAT3 DXLIB_DLL Div(DirectX::XMFLOAT3 a, float v);
-	DirectX::XMFLOAT3 DXLIB_DLL Mul(DirectX::XMFLOAT3 a, float v);
 	bool DXLIB_DLL Equal(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
 	DirectX::XMFLOAT3 DXLIB_DLL Neg(DirectX::XMFLOAT3 a);
 	DirectX::XMFLOAT4 DXLIB_DLL Div(DirectX::XMFLOAT4 a, float v);

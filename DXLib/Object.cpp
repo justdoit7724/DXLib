@@ -119,7 +119,7 @@ void Object::UpdateBound()
 	XMFLOAT3 wMinPt = Multiply(boundlMinPt, world);
 	XMFLOAT3 wMaxPt = Multiply(boundlMaxPt, world);
 	bound.p = transform->GetPos();
-	bound.rad = Length(Sub(wMinPt, wMaxPt)) * 0.5f;
+	bound.rad = Length(wMinPt- wMaxPt) * 0.5f;
 }
 
 void Object::UpdateCollider()

@@ -191,6 +191,34 @@ assert(SUCCEEDED(r))
 		return ret;
 	}
 
+
+	inline XMFLOAT3 operator+(const XMFLOAT3& a, const XMFLOAT3& b)
+	{
+		XMFLOAT3 output;
+		output.x = a.x + b.x;
+		output.y = a.y + b.y;
+		output.z = a.z + b.z;
+		return output;
+	}
+
+	inline XMFLOAT3 operator -(const XMFLOAT3& a, const XMFLOAT3& b)
+	{
+		XMFLOAT3 output;
+		output.x = a.x - b.x;
+		output.y = a.y - b.y;
+		output.z = a.z - b.z;
+		return output;
+	}
+
+	inline XMFLOAT3 operator*(XMFLOAT3 v, float f)
+	{
+		XMFLOAT3 output;
+		output.x = v.x * f;
+		output.y = v.y * f;
+		output.z = v.z * f;
+		return output;
+	}
+
 }
 
 

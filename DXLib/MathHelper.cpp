@@ -65,27 +65,6 @@ namespace DX {
 
 		return (abs(a.x - b.x) < eps && abs(a.y - b.y) < eps);
 	}
-	XMFLOAT3 Add(std::vector<XMFLOAT3> a)
-	{
-		XMFLOAT3 out = { 0,0 ,0};
-		for (int i = 0; i < a.size(); ++i)
-		{
-			out.x += a[i].x;
-			out.y += a[i].y;
-			out.z += a[i].z;
-		}
-
-		return out;
-	}
-	XMFLOAT3 Sub(XMFLOAT3 a, XMFLOAT3 b)
-	{
-		XMFLOAT3 out;
-		out.x = a.x - b.x;
-		out.y = a.y - b.y;
-		out.z = a.z - b.z;
-
-		return out;
-	}
 	XMFLOAT3 Add(XMFLOAT3 a, float v)
 	{
 		XMFLOAT3 out;
@@ -108,14 +87,6 @@ namespace DX {
 		out.x = a.x / v;
 		out.y = a.y / v;
 		out.z = a.z / v;
-		return out;
-	}
-	XMFLOAT3 Mul(XMFLOAT3 a, float v)
-	{
-		XMFLOAT3 out;
-		out.x = a.x * v;
-		out.y = a.y * v;
-		out.z = a.z * v;
 		return out;
 	}
 	bool Equal(XMFLOAT3 a, XMFLOAT3 b)
@@ -199,7 +170,7 @@ namespace DX {
 
 	 XMFLOAT3 Lerp(XMFLOAT3 v1, XMFLOAT3 v2, float t)
 	{
-		 return Add({ v1 , Mul((Sub(v2, v1)) , Clamp(0, 1, t)) });
+		 return  v1 + (v2- v1 )* Clamp(0, 1, t) ;
 	}
 
 	 float Dot(XMFLOAT3 a, XMFLOAT3 b)
@@ -239,11 +210,11 @@ namespace DX {
 
 	XMFLOAT3 RotateFromDir(XMFLOAT3 p, XMFLOAT3 dir, float rad)
 	{
-		XMFLOAT3 c = Mul(dir , Dot(dir, p));
-		XMFLOAT3 right = Sub(p , c);
+		XMFLOAT3 c =dir * Dot(dir, p);
+		XMFLOAT3 right = p - c;
 		XMFLOAT3 up = Cross(dir, right);
 
-		return Add({ c , Mul(right , cosf(rad)) , Mul(up , sinf(rad)) });
+		return  c + right * cosf(rad) , up * sinf(rad);
 	}
 
 	XMFLOAT4 Multiply(XMFLOAT4 v, const XMMATRIX& m)

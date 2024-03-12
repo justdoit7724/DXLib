@@ -50,10 +50,7 @@ namespace DX {
 			Ray() :o(DirectX::XMFLOAT3(0, 0, 0)), d(DirectX::XMFLOAT3(0, 0, 0)) {}
 			Ray(const DirectX::XMFLOAT3& o, const DirectX::XMFLOAT3& d) : o(o), d(d) {}
 
-			DirectX::XMFLOAT3 operator() (float t) const {
-
-				return Add({ o , Mul(d , t) });
-			}
+			DirectX::XMFLOAT3 operator() (float t) const;
 		};
 		struct Ray2D {
 		public:

@@ -359,7 +359,7 @@ void DX::Plot3DGraphic::UpdateCamMovement(float spf)
 	XMMATRIX rotMat = XMMatrixRotationX(angleVer) * XMMatrixRotationY(angleHor);
 	pos = Multiply(pos, rotMat);
 	XMFLOAT3 f = Normalize(Neg(pos));
-	pos = Add({ pos, XMFLOAT3(AXIS_WIDTH / 2, AXIS_HEIGHT / 2, AXIS_WIDTH / 2) });
+	pos = pos+ XMFLOAT3(AXIS_WIDTH / 2, AXIS_HEIGHT / 2, AXIS_WIDTH / 2);
 	
 	cam->transform->SetTranslation(pos);
 	cam->transform->SetRot(f);

@@ -102,16 +102,16 @@ void Camera::Update()
 
 		float tri = tan(verticalRadian * 0.5f);
 		XMFLOAT3 trDir = Normalize(
-			Add({ Mul(right, tri * f * aspectRatio),
-			Mul(up, tri * f),
-			Mul(forward, f) }));
+			right* tri * f * aspectRatio+
+			up * tri * f+
+			forward* f );
 		XMFLOAT3 blDir = Normalize(
-			Add({Mul(Neg(right), tri * f * aspectRatio) ,
-			Mul(Neg(up), tri * f),
-			Mul(forward, f)}));
+			Neg(right)* tri * f * aspectRatio +
+			Neg(up)* tri * f+
+			forward* f);
 
-		frustum.front = Geometrics::PlaneInf(Add({ p, Mul(forward, f) }), Neg(forward));
-		frustum.back = Geometrics::PlaneInf(Add({ p, Mul(forward, n) }), forward);
+		frustum.front = Geometrics::PlaneInf( p+ forward* f , Neg(forward));
+		frustum.back = Geometrics::PlaneInf( p+ forward* n, forward);
 		frustum.left = Geometrics::PlaneInf(p, Cross(up, blDir));
 		frustum.right = Geometrics::PlaneInf(p, Cross(Neg(up), trDir));
 		frustum.top = Geometrics::PlaneInf(p, Cross(right, trDir));
@@ -170,7 +170,7 @@ void Camera::Pick(XMFLOAT2 scnPos, OUT Geometrics::Ray* ray)const
 			1);
 		vDir = Normalize(vPos);
 
-		ray->o = Add({ eye, Mul(right, vPos.x) , Mul(up, vPos.y) });
+		ray->o =  eye+ right* vPos.x + up* vPos.y;
 
 		ray->d = forward;
 	}

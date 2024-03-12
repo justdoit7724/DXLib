@@ -20,9 +20,9 @@ inline void Subdivide(std::vector<XMFLOAT3>& vertice, std::vector<int>& indice)
 		XMFLOAT3 v2 = tempVertice[tempIndice[i + 1]];
 		XMFLOAT3 v3 = tempVertice[tempIndice[i + 2]];
 
-		XMFLOAT3 nv1 = Normalize(Mul(Add({ v1, v3 }), 2));
-		XMFLOAT3 nv2 = Normalize(Mul(Add({ v1, v2 }), 2));
-		XMFLOAT3 nv3 = Normalize(Mul(Add({ v3, v2 }), 2));
+		XMFLOAT3 nv1 = Normalize( v1+ v3 * 2);
+		XMFLOAT3 nv2 = Normalize( v1+ v2 * 2);
+		XMFLOAT3 nv3 = Normalize( v3+ v2 * 2);
 
 
 		// compute 3 new vertices by spliting half on each edge

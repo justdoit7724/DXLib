@@ -162,6 +162,9 @@
     <ClInclude Include="Text.h">
       <Filter>Actors</Filter>
     </ClInclude>
+    <ClInclude Include="CircleMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -267,6 +270,9 @@
       <Filter>Actors</Filter>
     </ClCompile>
     <ClCompile Include="Geometrics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CircleMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,16 +3,22 @@
 
 using namespace DX;
 
+
+XMFLOAT3 Geometrics::Ray::operator() (float t) const {
+
+	return  o + d * t;
+}
+
 bool Geometrics::IntersectInPlaneSphere(PlaneInf plane, Sphere sph)
 {
-	float proj = Dot(Sub(sph.p, plane.p), plane.n);
+	float proj = Dot(sph.p- plane.p, plane.n);
 
 	return ((proj + sph.rad) > 0);
 }
 
 bool Geometrics::IntersectRaySphere(Ray ray, Sphere sph)
 {
-	DirectX::XMFLOAT3 toRayPt = Sub(ray.o, sph.p);
+	DirectX::XMFLOAT3 toRayPt = ray.o- sph.p;
 	DirectX::XMFLOAT3 tempRight = Normalize(Cross(ray.d, toRayPt));
 	DirectX::XMFLOAT3 dir = Cross(tempRight, ray.d);
 
@@ -25,8 +31,8 @@ bool Geometrics::IntersectRayPlaneInf(const Ray ray, const PlaneInf plane, Direc
 	if (dirDot == 0)
 		return false;
 
-	float t = Dot(plane.n, Sub(plane.p, ray.o)) / dirDot;
-	*itsPt = Add({ ray.o , Mul(ray.d , t) });
+	float t = Dot(plane.n, plane.p- ray.o) / dirDot;
+	*itsPt = ray.o + ray.d * t;
 
 	return true;
 }
@@ -37,15 +43,15 @@ bool Geometrics::IntersectRayPlane(Ray ray, Plane plane, DirectX::XMFLOAT3* itsP
 	if (dirDot == 0)
 		return false;
 
-	float t = Dot(plane.normal, Sub(plane.c, ray.o)) / dirDot;
-	DirectX::XMFLOAT3 pt = Add({ ray.o , Mul(ray.d, t) });
-	float xDist = abs(Dot(plane.right, Sub(pt, plane.c)));
-	float yDist = abs(Dot(plane.up, Sub(pt, plane.c)));
+	float t = Dot(plane.normal, plane.c- ray.o) / dirDot;
+	DirectX::XMFLOAT3 pt = ray.o + ray.d* t;
+	float xDist = abs(Dot(plane.right, pt- plane.c));
+	float yDist = abs(Dot(plane.up, pt- plane.c));
 	if (itsPt)
 		*itsPt = pt;
 
 	return (
-		(Dot(ray.d, Sub(pt, ray.o)) > 0) && // check if ray is ahead of plane
+		(Dot(ray.d, pt- ray.o) > 0) && // check if ray is ahead of plane
 		(xDist < plane.rad.x) &&  // check if hitPt is in x range
 		(yDist < plane.rad.y) // check if hitPt is in y range
 		);

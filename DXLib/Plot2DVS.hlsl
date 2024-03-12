@@ -10,7 +10,7 @@ struct VS_OUTPUT
 VS_OUTPUT main(STD_VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.pos = input.pos;
+    output.pos = float4(input.pos,0);
     output.tex = input.tex;
 
 	return output;

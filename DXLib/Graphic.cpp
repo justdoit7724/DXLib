@@ -17,19 +17,13 @@ namespace DX {
 
 
 	Graphic::Graphic(HWND _hwnd, int msaa)
-		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false)
+		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false), m_hwnd(_hwnd)
 	{
 		assert(msaa == 1 || msaa == 2 || msaa == 4 || msaa == 8 || msaa == 16);
 
-		RECT rc;
-		if (!GetClientRect(_hwnd, &rc))
-		{
-			return;
-		}
+		RECT rc = GetWndSize();
 		int iWidth = rc.right - rc.left;
 		int iHeight = rc.bottom - rc.top;
-
-		m_hwnd = _hwnd;
 
 		DXGI_SWAP_CHAIN_DESC scd;
 		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -275,7 +269,7 @@ namespace DX {
 	RECT Graphic::GetWndSize() const
 	{
 		RECT rc;
-		GetWindowRect(m_hwnd, &rc);
+		GetClientRect(m_hwnd, &rc);
 		return rc;
 	}
 

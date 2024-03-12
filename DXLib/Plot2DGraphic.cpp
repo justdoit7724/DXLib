@@ -4,6 +4,7 @@
 #include "LineMesh.h"
 #include "Transform.h"
 #include "Text.h"
+#include "CircleMesh.h"
 #include "Camera.h"
 
 using namespace DX;
@@ -13,17 +14,24 @@ using namespace DX;
 #define SCN_PLOT_WIDTH 400
 #define SCN_PLOT_HEIGHT 400
 
+#define PLOT_RES_WIDTH 500
+#define PLOT_RES_HEIGHT 500
+
 Plot2DGraphic::Plot2DGraphic(HWND hwnd)
 	:Graphic(hwnd), m_axis(nullptr)
 {
+	auto rc = GetWndSize();
+	const int width = rc.right - rc.left;
+	const int height = rc.bottom - rc.top;
+
+
 	Actor* tmp;
 	CreateActor(ActorKind::Camera, &tmp);
 	auto cam = (Camera*)tmp;
-	auto rc = GetWndSize();
-	cam->SetFrame(FRAME_KIND_ORTHOGONAL, XMFLOAT2( rc.right - rc.left , rc.bottom - rc.top ), 0.1, 100, NULL, NULL);
-	cam->transform->SetRot(DOWN, FORWARD);
+	cam->SetFrame(FRAME_KIND_ORTHOGONAL, XMFLOAT2(width, height), 0.1, 100, NULL, NULL);
+	cam->transform->SetRot(FORWARD);
 	SetMainCamera(cam);
-	cam->transform->SetTranslation((SCN_PLOT_MARGIN_LEFT + SCN_PLOT_WIDTH)/2, 10, (SCN_PLOT_MARGIN_BOTTOM + SCN_PLOT_HEIGHT)/2);
+	cam->transform->SetTranslation((SCN_PLOT_MARGIN_LEFT + SCN_PLOT_WIDTH)/2, (SCN_PLOT_MARGIN_BOTTOM + SCN_PLOT_HEIGHT) / 2, -10);
 
 	CreateActor(ActorKind::Object, &tmp);
 	m_axis = (Object*)tmp;
@@ -32,9 +40,9 @@ Plot2DGraphic::Plot2DGraphic(HWND hwnd)
 
 	Mesh* mesh = new LineMesh();
 	mesh->Resize(3);
-	mesh->SetPos(0, XMFLOAT3(SCN_PLOT_MARGIN_LEFT, 0, SCN_PLOT_MARGIN_BOTTOM));
-	mesh->SetPos(1, XMFLOAT3(SCN_PLOT_MARGIN_LEFT+ SCN_PLOT_WIDTH, 0, SCN_PLOT_MARGIN_BOTTOM));
-	mesh->SetPos(2, XMFLOAT3(SCN_PLOT_MARGIN_LEFT, 0, SCN_PLOT_MARGIN_BOTTOM+ SCN_PLOT_HEIGHT));
+	mesh->SetPos(0, XMFLOAT3(SCN_PLOT_MARGIN_LEFT, SCN_PLOT_MARGIN_BOTTOM, 0));
+	mesh->SetPos(1, XMFLOAT3(SCN_PLOT_MARGIN_LEFT+ SCN_PLOT_WIDTH, SCN_PLOT_MARGIN_BOTTOM, 0));
+	mesh->SetPos(2, XMFLOAT3(SCN_PLOT_MARGIN_LEFT, SCN_PLOT_MARGIN_BOTTOM + SCN_PLOT_HEIGHT,0));
 	mesh->SetColor(0, COLOR_DARK_GRAY);
 	mesh->SetColor(1, COLOR_DARK_GRAY);
 	mesh->SetColor(2, COLOR_DARK_GRAY);
@@ -53,7 +61,7 @@ Plot2DGraphic::Plot2DGraphic(HWND hwnd)
 		m_axisHorUnits.back()->Set3D(true);
 		m_axisHorUnits.back()->SetStr(std::to_string(i * SCN_PLOT_WIDTH / 6));
 		m_axisHorUnits.back()->SetScale(0.5, 0.5);
-		m_axisHorUnits.back()->SetPos(SCN_PLOT_MARGIN_LEFT+i* SCN_PLOT_WIDTH /6, 0, SCN_PLOT_MARGIN_BOTTOM -unitSpacing);
+		m_axisHorUnits.back()->SetPos(SCN_PLOT_MARGIN_LEFT+i* SCN_PLOT_WIDTH /6, SCN_PLOT_MARGIN_BOTTOM - unitSpacing, 0);
 
 		CreateActor(ActorKind::Text, &tmp);
 		m_axisVerUnits.push_back((Text*)tmp);
@@ -61,44 +69,48 @@ Plot2DGraphic::Plot2DGraphic(HWND hwnd)
 		std::string str = std::to_string(i * SCN_PLOT_HEIGHT / 6);
 		m_axisVerUnits.back()->SetStr(str);
 		m_axisVerUnits.back()->SetScale(0.5, 0.5);
-		m_axisVerUnits.back()->SetPos(SCN_PLOT_MARGIN_LEFT - unitSpacing * str.size(), 0, SCN_PLOT_MARGIN_BOTTOM + i * SCN_PLOT_HEIGHT / 6);
+		m_axisVerUnits.back()->SetPos(SCN_PLOT_MARGIN_LEFT - unitSpacing * str.size(), SCN_PLOT_MARGIN_BOTTOM + i * SCN_PLOT_HEIGHT / 6, 0);
 
 	}
 
 
-	CreateActor(ActorKind::Object, &tmp);
-	m_plotQuad = (Object*)tmp;
-	m_plotQuad->GetTransform()->SetTranslation(0, 0, 0);
-	m_plotQuad->SetUnlit(true);
-	mesh=m_plotQuad->GetShape();
-	mesh->Clear();
-	mesh->Resize(4);
-	Vertex vertex;
-	vertex.pos = { SCN_PLOT_MARGIN_LEFT, 0, SCN_PLOT_MARGIN_BOTTOM };
-	vertex.tex = { 0,1 };
-	vertex.color = COLOR_RED;
-	mesh->SetVertex(0, vertex);
-	vertex.pos = { SCN_PLOT_MARGIN_LEFT+ SCN_PLOT_WIDTH, 0, SCN_PLOT_MARGIN_BOTTOM };
-	vertex.tex = { 1,1 };
-	vertex.color = COLOR_BLUE;
-	mesh->SetVertex(1, vertex);
-	vertex.pos = { SCN_PLOT_MARGIN_LEFT, 0, SCN_PLOT_MARGIN_BOTTOM+ SCN_PLOT_HEIGHT };
-	vertex.tex = { 0,0 };
-	vertex.color = COLOR_GREEN;
-	mesh->SetVertex(2, vertex);
-	vertex.pos = { SCN_PLOT_MARGIN_LEFT + SCN_PLOT_WIDTH, 0, SCN_PLOT_MARGIN_BOTTOM + SCN_PLOT_HEIGHT };
-	vertex.tex = { 1,0 };
-	vertex.color = COLOR_DARK_GRAY;
-	mesh->SetVertex(3, vertex);
+	//CreateActor(ActorKind::Object, &tmp);
+	//m_plotQuad = (Object*)tmp;
+	//m_plotQuad->GetTransform()->SetTranslation(0, 0, 0);
+	//m_plotQuad->SetUnlit(true);
+	//mesh=m_plotQuad->GetShape();
+	//mesh->Clear();
+	//mesh->Resize(4);
+	//Vertex vertex;
+	//vertex.pos = { SCN_PLOT_MARGIN_LEFT, 0, SCN_PLOT_MARGIN_BOTTOM };
+	//vertex.tex = { 0,1 };
+	//vertex.color = COLOR_RED;
+	//mesh->SetVertex(0, vertex);
+	//vertex.pos = { SCN_PLOT_MARGIN_LEFT+ SCN_PLOT_WIDTH, 0, SCN_PLOT_MARGIN_BOTTOM };
+	//vertex.tex = { 1,1 };
+	//vertex.color = COLOR_BLUE;
+	//mesh->SetVertex(1, vertex);
+	//vertex.pos = { SCN_PLOT_MARGIN_LEFT, 0, SCN_PLOT_MARGIN_BOTTOM+ SCN_PLOT_HEIGHT };
+	//vertex.tex = { 0,0 };
+	//vertex.color = COLOR_GREEN;
+	//mesh->SetVertex(2, vertex);
+	//vertex.pos = { SCN_PLOT_MARGIN_LEFT + SCN_PLOT_WIDTH, 0, SCN_PLOT_MARGIN_BOTTOM + SCN_PLOT_HEIGHT };
+	//vertex.tex = { 1,0 };
+	//vertex.color = COLOR_DARK_GRAY;
+	//mesh->SetVertex(3, vertex);
 
-	indice.clear();
-	indice.push_back(0);
-	indice.push_back(2);
-	indice.push_back(1);
-	indice.push_back(1);
-	indice.push_back(2);
-	indice.push_back(3);
-	mesh->SetIndice(indice.data(), indice.size());
+	//indice.clear();
+	//indice.push_back(0);
+	//indice.push_back(2);
+	//indice.push_back(1);
+	//indice.push_back(1);
+	//indice.push_back(2);
+	//indice.push_back(3);
+	//mesh->SetIndice(indice.data(), indice.size());
+
+
+
+
 }
 
 DX::Plot2DGraphic::~Plot2DGraphic()
@@ -106,12 +118,27 @@ DX::Plot2DGraphic::~Plot2DGraphic()
 	Clear();
 }
 
-void DX::Plot2DGraphic::Plot(std::vector<DirectX::XMFLOAT2> pt, DirectX::XMFLOAT3 color)
+void DX::Plot2DGraphic::Update(float spf)
 {
+	Graphic::Update(spf);
 }
 
-void DX::Plot2DGraphic::Scatter(std::vector<DirectX::XMFLOAT2> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT3> colors)
+void DX::Plot2DGraphic::Plot(std::vector<DirectX::XMFLOAT2> pt, DirectX::XMFLOAT4 color, float thick)
 {
+	m_linesPos.push_back(pt);
+	m_linesCol.push_back(color);
+	m_linesThick.push_back(thick);
+
+	UpdatePlot();
+}
+
+void DX::Plot2DGraphic::Scatter(std::vector<DirectX::XMFLOAT2> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT4> colors)
+{
+	m_scatterPts.push_back(pt);
+	m_scatterRads.push_back(rads);
+	m_scatterCols.push_back(colors);
+
+	UpdatePlot();
 }
 
 void DX::Plot2DGraphic::Clear()
@@ -127,6 +154,14 @@ void DX::Plot2DGraphic::ClearPlot()
 
 void DX::Plot2DGraphic::ClearScatter()
 {
+	m_scatterCols.clear();
+	m_scatterPts.clear();
+	m_scatterRads.clear();
+	for (auto o : m_scatterObjs)
+	{
+		o->Release();
+	}
+	m_scatterObjs.clear();
 }
 
 void DX::Plot2DGraphic::ClearAxis()
@@ -145,4 +180,137 @@ void DX::Plot2DGraphic::ClearAxis()
 
 void DX::Plot2DGraphic::UpdateCamMovement(float spf)
 {
+}
+
+void DX::Plot2DGraphic::UpdatePlot()
+{
+	for (auto o : m_scatterObjs)
+	{
+		o->Release();
+	}
+	m_scatterObjs.clear();
+	for (auto l : m_linesObj)
+	{
+		l->Release();
+	}
+	m_linesObj.clear();
+
+
+	//calculate range
+	XMFLOAT2 x1Range(FLT_MAX, FLT_MIN);
+	XMFLOAT2 x2Range(FLT_MAX, FLT_MIN);
+	float x1Length;
+	float x2Length;
+	{
+		for (int i = 0; i < m_scatterPts.size(); ++i)
+		{
+			for (int j = 0; j < m_scatterPts[i].size(); ++j)
+			{
+				x1Range.x = min(x1Range.x, m_scatterPts[i][j].x);
+				x1Range.y = max(x1Range.y, m_scatterPts[i][j].x);
+				x2Range.x = min(x2Range.x, m_scatterPts[i][j].y);
+				x2Range.y = max(x2Range.y, m_scatterPts[i][j].y);
+			}
+		}
+
+		for (int y = 0; y < m_linesPos.size(); ++y)
+		{
+			for (int x = 0; x < m_linesPos[y].size(); ++x)
+			{
+				x1Range.x = min(x1Range.x, m_linesPos[y][x].x);
+				x1Range.y = max(x1Range.y, m_linesPos[y][x].x);
+				x2Range.x = min(x2Range.x, m_linesPos[y][x].y);
+				x2Range.y = max(x2Range.y, m_linesPos[y][x].y);
+			}
+		}
+		x1Length = x1Range.y - x1Range.x;
+		x2Length = x2Range.y - x2Range.x;
+	}
+
+
+	//Create & Update Scatter Obj
+	for (int i = 0; i < m_scatterPts.size(); ++i)
+	{
+		for (int j = 0; j < m_scatterPts[i].size(); ++j)
+		{
+			XMFLOAT3 mPt;
+			mPt.x = ((m_scatterPts[i][j].x - x1Range.x) / x1Length)*SCN_PLOT_WIDTH + SCN_PLOT_MARGIN_LEFT;
+			mPt.y = ((m_scatterPts[i][j].y - x2Range.x) / x2Length)*SCN_PLOT_HEIGHT + SCN_PLOT_MARGIN_BOTTOM;
+			mPt.z = -0.01;
+
+			Actor* tmp;
+			CreateActor(ActorKind::Object, &tmp);
+			m_scatterObjs.push_back((Object*)tmp);
+
+			m_scatterObjs.back()->SetUnlit(true);
+			m_scatterObjs.back()->SetShape(new CircleMesh(Device(), 10));
+			m_scatterObjs.back()->GetTransform()->SetScale(m_scatterRads[i][j]);
+			m_scatterObjs.back()->GetTransform()->SetTranslation(mPt);
+			m_scatterObjs.back()->GetTransform()->SetRot(UP);
+			auto mesh = m_scatterObjs.back()->GetShape();
+
+			for (int k = 0; k < mesh->Count(); ++k)
+			{
+				mesh->SetColor(k, m_scatterCols[i][j]);
+			}
+		}
+	}
+
+
+	//Create & Update Line Obj
+	std::vector<int> indice;
+	indice.push_back(0);
+	indice.push_back(1);
+	indice.push_back(2);
+	indice.push_back(1);
+	indice.push_back(3);
+	indice.push_back(2);
+	for (int i = 0; i < m_linesPos.size(); i++)
+	{
+		for (int j = 0; j < m_linesPos[i].size() - 1; j += 2)
+		{
+			XMFLOAT3 mPt1;
+			mPt1.x = ((m_linesPos[i][j].x - x1Range.x) / x1Length)*SCN_PLOT_WIDTH + SCN_PLOT_MARGIN_LEFT;
+			mPt1.y = ((m_linesPos[i][j].y - x2Range.x) / x2Length)*SCN_PLOT_HEIGHT+SCN_PLOT_MARGIN_BOTTOM;
+			mPt1.z = -0.01;
+			XMFLOAT3 mPt2;
+			mPt2.x = ((m_linesPos[i][j+1].x - x1Range.x) / x1Length)*SCN_PLOT_WIDTH+SCN_PLOT_MARGIN_LEFT;
+			mPt2.y = ((m_linesPos[i][j+1].y - x2Range.x) / x2Length)*SCN_PLOT_HEIGHT+SCN_PLOT_MARGIN_BOTTOM;
+			mPt2.z = -0.01;
+
+			XMFLOAT3 dir = Normalize(mPt1 - mPt2);
+			XMFLOAT3 sideDir = Cross(dir, BACKWARD);
+
+			Actor* tmp;
+			CreateActor(ActorKind::Object, &tmp);
+			m_linesObj.push_back((Object*)tmp);
+			m_linesObj.back()->SetUnlit(true);
+			auto mesh = m_linesObj.back()->GetShape();
+			mesh->Clear();
+			mesh->Resize(4);
+			mesh->SetPos(0, mPt1 + sideDir * (m_linesThick[i] / 2));
+			mesh->SetPos(1, mPt1 - sideDir * (m_linesThick[i] / 2));
+			mesh->SetPos(2, mPt2 + sideDir * (m_linesThick[i] / 2));
+			mesh->SetPos(3, mPt2 - sideDir * (m_linesThick[i] / 2));
+
+			for (int k = 0; k < mesh->Count(); ++k)
+			{
+				mesh->SetColor(k, m_linesCol[i]);
+			}
+			mesh->SetIndice(indice.data(), indice.size());
+		}
+	}
+
+
+	//Update axis
+	for (int i = 0; i < m_axisVerUnits.size(); ++i)
+	{
+		m_axisUnitPX[i]->SetStr(ToString(x2Range.x + x2Length * i, 0));
+
+		m_axisUnitNX[i]->SetStr(ToString(x2Range.x + x2Length * i, 0));
+
+		m_axisUnitPZ[i]->SetStr(ToString(x1Range.x + x1Length * i, 0));
+
+		m_axisUnitNZ[i]->SetStr(ToString(x1Range.x + x1Length * i, 0));
+	}
 }
