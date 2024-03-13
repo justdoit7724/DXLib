@@ -17,7 +17,7 @@ cbuffer EYE : register(b4)\
 float4 isUnlit; \
 };
 
-//#define SHADER_REG_CB_MATERIAL register(b4)
+#define SHADER_REG_CB_MATERIAL register(b5)
 //#define SHADER_REG_CB_LIGHTVP register(b5)
 
 //#define SHADER_REG_SRV_CM register(t0)

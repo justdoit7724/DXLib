@@ -78,11 +78,14 @@ DX::Object::Object(Graphic* graphic)
 	vs->AddCB(graphic->Device(), 0, 1, sizeof(SHADER_STD_TRANSF));
 	ps->AddCB(graphic->Device(), SHADER_REG_CB_UNLIT, 1, sizeof(XMFLOAT4));
 
+	m_material = new SHADER_MATERIAL(XMFLOAT3(0.6, 0.6, 0.6), 0.4, XMFLOAT3(0.6, 0.6, 0.6), XMFLOAT3(1.0, 1.0, 1.0));
+	ps->AddCB(graphic->Device(), SHADER_REG_CB_MATERIAL, 1, sizeof(SHADER_MATERIAL));
+	ps->WriteCB(graphic->DContext(), SHADER_REG_CB_MATERIAL, m_material);
+
 	blendState = new BlendState(graphic->Device(), nullptr);
 	dsState = new DepthStencilState(graphic->Device(), nullptr);
 	rsState = new RasterizerState(graphic->Device(), nullptr);
 
-	m_material = new SHADER_MATERIAL(XMFLOAT3(0.6, 0.6, 0.6), 0.4, XMFLOAT3(0.6, 0.6, 0.6), XMFLOAT3(1.0, 1.0, 1.0));
 }
 
 Object::~Object()

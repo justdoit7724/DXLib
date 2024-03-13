@@ -18,6 +18,7 @@ namespace DX
 
         void Plot(std::vector<DirectX::XMFLOAT2> pt, DirectX::XMFLOAT4 color, float thick);
         void Scatter(std::vector<DirectX::XMFLOAT2> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT4> colors);
+        void Surface(std::vector<std::vector<float>> x, std::vector<std::vector<float>> y, std::vector<std::vector<float>> v, float colRangeBegin, float colRangeEnd);
         void Clear();
         void ClearPlot();
         void ClearScatter();
@@ -47,6 +48,11 @@ namespace DX
         std::vector<Object*> m_linesObj;
 
 
+        std::vector<std::vector<float>> m_surfaceX;
+        std::vector<std::vector<float>> m_surfaceY;
+        std::vector<std::vector<float>> m_surfaceV;
+        DirectX::XMFLOAT2 m_surfaceColRange;
+        Object* m_surfaceObj;
 
         D3D11_VIEWPORT m_plotVP;
     };

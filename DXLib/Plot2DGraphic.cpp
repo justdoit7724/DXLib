@@ -18,7 +18,7 @@ using namespace DX;
 #define PLOT_RES_HEIGHT 500
 
 Plot2DGraphic::Plot2DGraphic(HWND hwnd)
-	:Graphic(hwnd), m_axis(nullptr)
+	:Graphic(hwnd), m_axis(nullptr), m_surfaceObj(nullptr)
 {
 	auto rc = GetWndSize();
 	const int width = rc.right - rc.left;
@@ -141,6 +141,17 @@ void DX::Plot2DGraphic::Scatter(std::vector<DirectX::XMFLOAT2> pt, std::vector<f
 	UpdatePlot();
 }
 
+void DX::Plot2DGraphic::Surface(std::vector<std::vector<float>> x, std::vector<std::vector<float>> y, std::vector<std::vector<float>> v, float colRangeBegin, float colRangeEnd)
+{
+
+	m_surfaceX = x;
+	m_surfaceY = y;
+	m_surfaceV = v;
+	m_surfaceColRange = { colRangeBegin, colRangeEnd };
+
+	UpdatePlot();
+}
+
 void DX::Plot2DGraphic::Clear()
 {
 	ClearPlot();
@@ -194,7 +205,11 @@ void DX::Plot2DGraphic::UpdatePlot()
 		l->Release();
 	}
 	m_linesObj.clear();
-
+	if (m_surfaceObj)
+	{
+		m_surfaceObj->Release();
+		m_surfaceObj = nullptr;
+	}
 
 	//calculate range
 	XMFLOAT2 x1Range(FLT_MAX, FLT_MIN);
@@ -223,6 +238,19 @@ void DX::Plot2DGraphic::UpdatePlot()
 				x2Range.y = max(x2Range.y, m_linesPos[y][x].y);
 			}
 		}
+
+
+		for (int y = 0; y < m_surfaceX.size(); ++y)
+		{
+			for (int x = 0; x < m_surfaceX[y].size(); ++x)
+			{
+				x1Range.x = min(x1Range.x, m_surfaceX[y][x]);
+				x1Range.y = max(x1Range.y, m_surfaceX[y][x]);
+				x2Range.x = min(x2Range.x, m_surfaceY[y][x]);
+				x2Range.y = max(x2Range.y, m_surfaceY[y][x]);
+			}
+		}
+
 		x1Length = x1Range.y - x1Range.x;
 		x2Length = x2Range.y - x2Range.x;
 	}
@@ -236,7 +264,7 @@ void DX::Plot2DGraphic::UpdatePlot()
 			XMFLOAT3 mPt;
 			mPt.x = ((m_scatterPts[i][j].x - x1Range.x) / x1Length)*SCN_PLOT_WIDTH + SCN_PLOT_MARGIN_LEFT;
 			mPt.y = ((m_scatterPts[i][j].y - x2Range.x) / x2Length)*SCN_PLOT_HEIGHT + SCN_PLOT_MARGIN_BOTTOM;
-			mPt.z = -0.01;
+			mPt.z = -0.02;
 
 			Actor* tmp;
 			CreateActor(ActorKind::Object, &tmp);
@@ -301,16 +329,66 @@ void DX::Plot2DGraphic::UpdatePlot()
 		}
 	}
 
+	//Create & Update Surface
+	if (m_surfaceX.size())
+	{
+		const int n1 = m_surfaceX[0].size();
+		const int n2 = m_surfaceX.size();
+
+		Actor* tmp;
+		CreateActor(ActorKind::Object, &tmp);
+		m_surfaceObj = (Object*)tmp;
+		m_surfaceObj->SetUnlit(true);
+		auto mesh = m_surfaceObj->GetShape();
+		mesh->Clear();
+		mesh->Resize(n1 * n2);
+		for (int j = 0; j < n2; ++j)
+		{
+			for (int i = 0; i < n1; ++i)
+			{
+				int index = j * n1 + i;
+
+				Vertex vert;
+				vert.pos.x = SCN_PLOT_WIDTH * (m_surfaceX[j][i] - x1Range.x) / x1Length + SCN_PLOT_MARGIN_LEFT;
+				vert.pos.y = SCN_PLOT_HEIGHT * (m_surfaceY[j][i] - x2Range.x) / x2Length+ SCN_PLOT_MARGIN_BOTTOM;
+				vert.pos.z = 0;
+
+				auto col = GetColorScale((m_surfaceV[j][i] - m_surfaceColRange.x) / (m_surfaceColRange.y - m_surfaceColRange.x));
+				vert.color.x = col.x;
+				vert.color.y = col.y;
+				vert.color.z = col.z;
+				vert.color.w = 1;
+				mesh->SetVertex(index, vert);
+			}
+		}
+
+		std::vector<int> indice;
+		for (int y = 0; y < n2 - 1; ++y)
+		{
+			for (int x = 0; x < n1 - 1; ++x)
+			{
+				int bl = y * n1 + x;
+				int br = bl + 1;
+				int tl = bl + n1;
+				int tr = bl + 1 + n1;
+
+				indice.push_back(bl);
+				indice.push_back(tl);
+				indice.push_back(br);
+				indice.push_back(br);
+				indice.push_back(tl);
+				indice.push_back(tr);
+			}
+		}
+		mesh->SetIndice(indice.data(), indice.size());
+	}
+
 
 	//Update axis
 	for (int i = 0; i < m_axisVerUnits.size(); ++i)
 	{
-		m_axisUnitPX[i]->SetStr(ToString(x2Range.x + x2Length * i, 0));
+		m_axisHorUnits[i]->SetStr(ToString(x1Range.x + x1Length * i, 0));
 
-		m_axisUnitNX[i]->SetStr(ToString(x2Range.x + x2Length * i, 0));
-
-		m_axisUnitPZ[i]->SetStr(ToString(x1Range.x + x1Length * i, 0));
-
-		m_axisUnitNZ[i]->SetStr(ToString(x1Range.x + x1Length * i, 0));
+		m_axisVerUnits[i]->SetStr(ToString(x2Range.x + x2Length * i, 0));
 	}
 }

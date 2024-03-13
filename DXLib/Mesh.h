@@ -37,8 +37,8 @@ namespace DX {
 		int Count() const;
 		void Resize(int count = 1);
 		void SetVertex(int i, Vertex v);
-		void SetPos(int i, XMFLOAT3 pos);
-		void SetColor(int i, XMFLOAT4 col);
+		void SetPos(int i, DirectX::XMFLOAT3 pos);
+		void SetColor(int i, DirectX::XMFLOAT4 col);
 		Vertex GetVertex(int i) const;
 		void Clear();
 

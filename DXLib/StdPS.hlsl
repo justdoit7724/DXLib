@@ -42,13 +42,13 @@ float4 main(PS_INPUT input) : SV_Target
     float3 sSpecular = 0;
     ComputeSpotLight(input.wPos, input.normal, v, sAmbient, sDiffuse, sSpecular);
     
-    float3 tex = diffuseTex.Sample(pointSamp, input.tex).xyz;
+    float3 tex = /*diffuseTex.Sample(pointSamp, input.tex).xyz*/input.color.xyz;
     
     float3 ambient = (dAmbient + pAmbient + sAmbient) * tex;
     float3 diffuse = (dDiffuse + pDiffuse + sDiffuse) * tex;
     float3 spec = (dSpecular + pSpecular + sSpecular);
 
-    float4 litCol = float4(spec + ambient + diffuse, mDiffuse.w);
+    float4 litCol = float4(spec + ambient + diffuse, input.color.w);
 
     return Lerp(litCol, input.color, isUnlit.x);
 }
