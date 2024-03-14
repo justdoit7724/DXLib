@@ -433,6 +433,7 @@ namespace DX {
 
 	void Graphic::MouseRClick(bool click)
 	{
+
 		m_mouseRClicked = click;
 	}
 
