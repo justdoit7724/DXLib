@@ -12,12 +12,13 @@
 #include "CubeMesh.h"
 #include "ShaderReg.h"
 #include "Transform.h"
+#include "CubeCollider.h"
 
 namespace DX {
 
 
 	Graphic::Graphic(HWND _hwnd, int msaa)
-		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false), m_hwnd(_hwnd)
+		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false), m_hwnd(_hwnd), m_curPicked(nullptr)
 	{
 		assert(msaa == 1 || msaa == 2 || msaa == 4 || msaa == 8 || msaa == 16);
 
@@ -182,6 +183,34 @@ namespace DX {
 
 	void Graphic::Update(float spf)
 	{
+		//find pick obj
+		{
+			Geometrics::Ray camRay;
+			m_mainCamera->Pick({ m_mouseX, m_mouseY }, &camRay);
+
+			m_pickHit = NOWHERE;
+			m_curPicked = nullptr;
+			float closestDist = FLT_MAX;
+			for (auto a : m_actors.at(ActorKind::Object))
+			{
+				Object* obj = (Object*)a;
+				XMFLOAT3 hit;
+
+				if (obj->IsPicking(camRay, hit))
+				{
+					float dist = SqrLength(hit - m_mainCamera->transform->GetPos());
+					if (closestDist > dist)
+					{
+						closestDist = dist;
+						m_curPicked = obj;
+						m_pickHit = hit;
+					}
+				}
+			}
+
+		}
+
+		//main loop
 		for (auto it = m_actors.begin(); it!=m_actors.end(); ++it)
 		{
 			if (it->second.empty())
@@ -290,19 +319,23 @@ namespace DX {
 
 			newObject->SetShape(defaultMesh);
 			newObject->SetUnlit(false);
+			newObject->SetCollider(new CubeCollider(XMFLOAT3(0, 0, 0), XMFLOAT3(0.5, 0.5, 0.5)));
 
 			*out = newObject;
 		}
 		break;
 		case ActorKind::Camera:
 
-			*out = new Camera(this,FRAME_KIND_PERSPECTIVE, NULL, NULL, 1.0f, 1000.0f, XM_PIDIV2, 1, true);
+		{
+			RECT rc;
+			GetClientRect(m_hwnd, &rc);
+			*out = new Camera(this, FRAME_KIND_PERSPECTIVE, rc.right-rc.left, rc.bottom-rc.top, 1.0f, 1000.0f, XM_PIDIV2, 1, true);
 
 			if (!m_mainCamera)
 			{
-				m_mainCamera = *out;
+				m_mainCamera = (Camera*)*out;
 			}
-
+		}
 			break;
 		case ActorKind::Light_Direction:
 
@@ -347,17 +380,31 @@ namespace DX {
 		m_actors[kind].push_back(*out);
 	}
 
-	std::unordered_map<ActorKind, std::vector<Actor*>> Graphic::GetAllActors()const
+	std::vector<Actor*> Graphic::GetActors(ActorKind kind) const
 	{
-		return m_actors;
+		return m_actors.at(kind);
 	}
 
-	Actor* Graphic::MainCamera()const
+	Actor* Graphic::GetActor(std::string id) const
+	{
+		for (auto it : m_actors)
+		{
+			for (auto a : it.second)
+			{
+				if (a->m_id == id)
+					return a;
+			}
+		}
+
+		return nullptr;
+	}
+
+	Camera* Graphic::MainCamera()const
 	{
 		return m_mainCamera;
 	}
 
-	void Graphic::SetMainCamera(Actor* cam)
+	void Graphic::SetMainCamera(Camera* cam)
 	{
 		m_mainCamera = cam;
 	}
@@ -393,6 +440,14 @@ namespace DX {
 	{
 		m_mouseX = x;
 		m_mouseY = y;
+	}
+
+	Object* Graphic::PickObj(DirectX::XMFLOAT3* hit) const
+	{
+		if (hit)
+			*hit = m_pickHit;
+
+		return m_curPicked;
 	}
 
 	void Graphic::UpdateCamMovement(float spf)

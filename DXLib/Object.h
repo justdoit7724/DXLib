@@ -30,21 +30,25 @@ namespace DX {
 		VShader* vs;
 		PShader* ps;
 		BlendState* blendState = nullptr;
-		DepthStencilState* dsState = nullptr;
 		RasterizerState* rsState = nullptr;
-		std::shared_ptr <Collider> m_collider;
+		DepthStencilState* dsState = nullptr;
+		Collider* m_collider;
 		bool m_isUnlit;
 
-		friend class Graphic;
-		Object(Graphic* graphic);
-		virtual ~Object();
+		//outline
+		DepthStencilState* m_outlineMaskDSState = nullptr;
+		DepthStencilState* m_outlineRenderDSState = nullptr;
+
 
 	public:
+
+		Object(Graphic* graphic);
+		virtual ~Object();
 
 		void Update() override;
 		void Render() override;
 	
-		virtual bool IsPicking(Geometrics::Ray ray)const;
+		virtual bool IsPicking(Geometrics::Ray ray, DirectX::XMFLOAT3& hit)const;
 		virtual void UpdateBound();
 		virtual void UpdateCollider();
 
@@ -55,12 +59,14 @@ namespace DX {
 		void GetMainTex(ID3D11ShaderResourceView** pSRV);
 		void GetNormal(ID3D11ShaderResourceView** pNormal);
 
+		bool IsUnlit();
 		void SetUnlit(bool isUnlit);
 		void SetShape(Mesh* shape);
+		void SetCollider(Collider* collider);
 		Transform* GetTransform() { return transform; }
 		Mesh* GetShape() { return m_mesh; }
 
-
+		bool m_outlineMode;
 
 		SHADER_MATERIAL* m_material;
 		ID3D11ShaderResourceView* m_mainTex;

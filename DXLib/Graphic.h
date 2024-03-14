@@ -8,6 +8,8 @@
 namespace DX
 {
 	class VertexLayout;
+	class Camera;
+	class Object;
 
 	class DXLIB_DLL Graphic
 	{
@@ -29,9 +31,10 @@ namespace DX
 		std::vector<D3D11_INPUT_ELEMENT_DESC> GetLayout();
 
 		void CreateActor(ActorKind kind, Actor** out);
-		std::unordered_map<ActorKind, std::vector<Actor*>> GetAllActors() const;
-		Actor* MainCamera() const;
-		void SetMainCamera(Actor* cam);
+		std::vector<Actor*> GetActors(ActorKind kind) const;
+		Actor* GetActor(std::string id)const;
+		Camera* MainCamera() const;
+		void SetMainCamera(Camera* cam);
 
 		//movement
 		void EnableCamMovement(bool enable);
@@ -39,6 +42,8 @@ namespace DX
 		void MouseLClick(bool click = true);
 		void MouseRClick(bool click = true);
 		void MousePT(float x, float y);
+
+		Object* PickObj(DirectX::XMFLOAT3* hit) const;
 
 	protected:
 		Graphic() = delete;
@@ -60,8 +65,10 @@ namespace DX
 
 		std::unordered_map<ActorKind, std::vector<Actor*>> m_actors;
 
-		Actor* m_mainCamera;
-		
+		Camera* m_mainCamera;
+
+		Object* m_curPicked;
+		DirectX::XMFLOAT3 m_pickHit;
 		
 		bool m_enableCamMovement;
 		std::unordered_set<char> m_inputKeys;

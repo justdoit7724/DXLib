@@ -55,43 +55,43 @@ DirectionalLight::~DirectionalLight()
 void DirectionalLight::SetAmbient(const XMFLOAT3 & a)
 {
 	ambient = a;
-	m_data.ambient[m_id] = XMFLOAT4(a.x, a.y, a.z, 0);
+	m_data.ambient[m_index] = XMFLOAT4(a.x, a.y, a.z, 0);
 }
 
 void DirectionalLight::SetDiffuse(const XMFLOAT3 & d)
 {
 	diffuse = d;
-	m_data.diffuse[m_id] = XMFLOAT4(d.x, d.y, d.z, 0);
+	m_data.diffuse[m_index] = XMFLOAT4(d.x, d.y, d.z, 0);
 }
 
 void DirectionalLight::SetSpecular(const XMFLOAT3 & s)
 {
 	specular = s;
-	m_data.specular[m_id] = XMFLOAT4(s.x, s.y, s.z, 0);
+	m_data.specular[m_index] = XMFLOAT4(s.x, s.y, s.z, 0);
 }
 
 void DX::DirectionalLight::SetIntensity(float i)
 {
-	m_data.intensity[m_id] = XMFLOAT4(i, i, i, i);
+	m_data.intensity[m_index] = XMFLOAT4(i, i, i, i);
 }
 
 void DirectionalLight::SetDir(XMFLOAT3 d)
 {
-	m_data.dir[m_id] = XMFLOAT4(d.x, d.y, d.z, 0);
+	m_data.dir[m_index] = XMFLOAT4(d.x, d.y, d.z, 0);
 }
 
 void DirectionalLight::Enable(bool enable)
 {
 	if(enable)
-		m_data.enabled[m_id] = XMFLOAT4(LIGHT_ENABLED, LIGHT_ENABLED, LIGHT_ENABLED, LIGHT_ENABLED);
+		m_data.enabled[m_index] = XMFLOAT4(LIGHT_ENABLED, LIGHT_ENABLED, LIGHT_ENABLED, LIGHT_ENABLED);
 	else
-		m_data.enabled[m_id] = XMFLOAT4(LIGHT_DISABLED, LIGHT_DISABLED, LIGHT_DISABLED, LIGHT_DISABLED);
+		m_data.enabled[m_index] = XMFLOAT4(LIGHT_DISABLED, LIGHT_DISABLED, LIGHT_DISABLED, LIGHT_DISABLED);
 }
 
 
 XMFLOAT3 DirectionalLight::GetDir()const
 {
-	XMFLOAT4 dir = m_data.dir[m_id];
+	XMFLOAT4 dir = m_data.dir[m_index];
 
 	return XMFLOAT3(dir.x, dir.y, dir.z);
 }
@@ -152,50 +152,50 @@ PointLight::~PointLight()
 void PointLight::SetAmbient(const XMFLOAT3 & a)
 {
 	ambient = a;
-	m_data.ambient[m_id] = XMFLOAT4(a.x, a.y, a.z, 0);
+	m_data.ambient[m_index] = XMFLOAT4(a.x, a.y, a.z, 0);
 }
 
 void PointLight::SetDiffuse(const XMFLOAT3 & d)
 {
 	diffuse = d;
-	m_data.diffuse[m_id] = XMFLOAT4(d.x, d.y, d.z, 0);
+	m_data.diffuse[m_index] = XMFLOAT4(d.x, d.y, d.z, 0);
 }
 
 void PointLight::SetSpecular(const XMFLOAT3 & s)
 {
 	specular = s;
-	m_data.specular[m_id] = XMFLOAT4(s.x, s.y, s.z, 0);
+	m_data.specular[m_index] = XMFLOAT4(s.x, s.y, s.z, 0);
 }
 
 void DX::PointLight::SetIntensity(float i)
 {
-	m_data.intensity[m_id] = XMFLOAT4(i, i, i, i);
+	m_data.intensity[m_index] = XMFLOAT4(i, i, i, i);
 }
 
 void PointLight::SetPos(XMFLOAT3 p)
 {
-	m_data.pos[m_id] = XMFLOAT4(p.x, p.y, p.z, 0);
+	m_data.pos[m_index] = XMFLOAT4(p.x, p.y, p.z, 0);
 }
 
 
 void PointLight::SetAtt(XMFLOAT3 at)
 {
 	att = at;
-	m_data.att[m_id] = XMFLOAT4(at.x, at.y, at.z, 0);
+	m_data.att[m_index] = XMFLOAT4(at.x, at.y, at.z, 0);
 }
 
 void PointLight::Enable(bool enable)
 {
 	if(enable)
-		m_data.info[m_id].x = LIGHT_ENABLED;
+		m_data.info[m_index].x = LIGHT_ENABLED;
 	else
-		m_data.info[m_id].x = LIGHT_DISABLED;
+		m_data.info[m_index].x = LIGHT_DISABLED;
 
 }
 
 XMFLOAT3 DX::PointLight::GetPos()
 {
-	return XMFLOAT3(m_data.pos[m_id].x, m_data.pos[m_id].y, m_data.pos[m_id].z);
+	return XMFLOAT3(m_data.pos[m_index].x, m_data.pos[m_index].y, m_data.pos[m_index].z);
 }
 
 void PointLight::Update()
@@ -248,72 +248,72 @@ SpotLight::~SpotLight()
 void SpotLight::SetAmbient(const XMFLOAT3 & a)
 {
 	ambient = a;
-	m_data.ambient[m_id] = XMFLOAT4(ambient.x, ambient.y, ambient.z, 0);
+	m_data.ambient[m_index] = XMFLOAT4(ambient.x, ambient.y, ambient.z, 0);
 }
 
 void SpotLight::SetDiffuse(const XMFLOAT3 & d)
 {
 	diffuse = d;
-	m_data.diffuse[m_id] = XMFLOAT4(diffuse.x, diffuse.y, diffuse.z, 0);
+	m_data.diffuse[m_index] = XMFLOAT4(diffuse.x, diffuse.y, diffuse.z, 0);
 }
 
 void SpotLight::SetSpecular(const XMFLOAT3 & s)
 {
 	specular = s;
-	m_data.specular[m_id] = XMFLOAT4(specular.x, specular.y, specular.z, 0);
+	m_data.specular[m_index] = XMFLOAT4(specular.x, specular.y, specular.z, 0);
 }
 
 void DX::SpotLight::SetIntensity(float i)
 {
-	m_data.intensity[m_id] = XMFLOAT4(i, i, i, i);
+	m_data.intensity[m_index] = XMFLOAT4(i, i, i, i);
 }
 
 void SpotLight::SetPos(XMFLOAT3 p)
 {
-	m_data.pos[m_id] = XMFLOAT4(p.x, p.y, p.z, 0);
+	m_data.pos[m_index] = XMFLOAT4(p.x, p.y, p.z, 0);
 }
 
 void SpotLight::SetDir(XMFLOAT3 d)
 {
-	m_data.dir[m_id] = XMFLOAT4(d.x, d.y, d.z, 0);
+	m_data.dir[m_index] = XMFLOAT4(d.x, d.y, d.z, 0);
 }
 
 void SpotLight::SetRange(float r)
 {
 	range = r;
-	m_data.info[m_id].y = r;
+	m_data.info[m_index].y = r;
 }
 
 void SpotLight::SetRad(float r)
 {
 	rad = r;
-	m_data.info[m_id].z = r;
+	m_data.info[m_index].z = r;
 }
 
 
 void SpotLight::SetSpot(float s)
 {
 	spot = s;
-	m_data.info[m_id].w = spot;
+	m_data.info[m_index].w = spot;
 }
 
 void SpotLight::SetAtt(XMFLOAT3 at)
 {
 	att = at;
-	m_data.att[m_id] = XMFLOAT4(att.x, att.y,att.z, 0);
+	m_data.att[m_index] = XMFLOAT4(att.x, att.y,att.z, 0);
 }
 
 void SpotLight::Enable(bool enable)
 {
 	if (enable)
-		m_data.info[m_id].x = LIGHT_ENABLED;
+		m_data.info[m_index].x = LIGHT_ENABLED;
 	else
-		m_data.info[m_id].x = LIGHT_DISABLED;
+		m_data.info[m_index].x = LIGHT_DISABLED;
 }
 
 XMFLOAT3 DX::SpotLight::GetPos()
 {
-	return XMFLOAT3(m_data.pos[m_id].x, m_data.pos[m_id].y, m_data.pos[m_id].z);
+	return XMFLOAT3(m_data.pos[m_index].x, m_data.pos[m_index].y, m_data.pos[m_index].z);
 }
 
 void DX::SpotLight::Update()
@@ -330,7 +330,7 @@ void DX::SpotLight::Update()
 	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_SPOT_LIGHT, 1, &m_cb);
 }
 
-DX::Light::Light(const Graphic* graphic,int id, ActorKind lightKind)
-	:Actor(graphic, lightKind), m_id(id)
+DX::Light::Light(const Graphic* graphic,int index, ActorKind lightKind)
+	:Actor(graphic, lightKind), m_index(index)
 {
 }

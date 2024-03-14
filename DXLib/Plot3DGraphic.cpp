@@ -20,7 +20,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 {
 	Actor* tmp;
 	CreateActor(ActorKind::Camera, &tmp);
-	SetMainCamera(tmp);
+	SetMainCamera((Camera*)tmp);
 
 	CreateActor(ActorKind::Object, &tmp);
 	m_axisPX = (Object*)tmp;

@@ -68,7 +68,7 @@ Object::Object(ID3D11Device* device, ID3D11DeviceContext* dContext, std::string 
 */
 
 DX::Object::Object(Graphic* graphic)
-	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false)
+	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false), m_outlineMode(false), m_collider(nullptr)
 {
 	transform = new Transform();
 	auto layout = graphic->GetLayout();
@@ -86,6 +86,19 @@ DX::Object::Object(Graphic* graphic)
 	dsState = new DepthStencilState(graphic->Device(), nullptr);
 	rsState = new RasterizerState(graphic->Device(), nullptr);
 
+	D3D11_DEPTH_STENCIL_DESC outlineMaskDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
+	outlineMaskDesc.StencilEnable = true;
+	outlineMaskDesc.StencilWriteMask = 0xff;
+	outlineMaskDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	outlineMaskDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+	m_outlineMaskDSState = new DepthStencilState(graphic->Device(), &outlineMaskDesc);
+	D3D11_DEPTH_STENCIL_DESC outlineRenderDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
+	outlineRenderDesc.DepthEnable = false;
+	outlineRenderDesc.StencilEnable = true;
+	outlineRenderDesc.StencilReadMask = 0xff;
+	outlineRenderDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;
+	outlineRenderDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	m_outlineRenderDSState = new DepthStencilState(graphic->Device(), &outlineRenderDesc);
 }
 
 Object::~Object()
@@ -166,8 +179,12 @@ void DX::Object::GetNormal(ID3D11ShaderResourceView** ppNormal)
 }
 
 
+bool Object::IsUnlit() {
+	return m_isUnlit;
+}
 void DX::Object::SetUnlit(bool isUnlit)
 {
+	m_isUnlit = isUnlit;
 	XMFLOAT4 unlitPassData(isUnlit ? 1 : 0, 0, 0, 0);
 	ps->WriteCB(m_graphic->DContext(), SHADER_REG_CB_UNLIT, &unlitPassData);
 }
@@ -178,6 +195,14 @@ void DX::Object::SetShape(Mesh* shape)
 		delete m_mesh;
 
 	m_mesh = shape;
+}
+
+void DX::Object::SetCollider(Collider* collider)
+{
+	if (m_collider)
+		delete m_collider;
+
+	m_collider = collider;
 }
 
 
@@ -209,11 +234,37 @@ void Object::Render()
 		vs->Apply(m_graphic);
 		ps->Apply(m_graphic);
 
-		dsState->Apply(m_graphic);
 		blendState->Apply(m_graphic);
 		rsState->Apply(m_graphic);
 
-		m_mesh->Apply(m_graphic);
+
+		if (m_outlineMode)
+		{
+			//pass1
+			m_outlineMaskDSState->Apply(m_graphic);
+			m_mesh->Apply(m_graphic);
+
+			//pass2
+			m_outlineRenderDSState->Apply(m_graphic);
+
+			auto oriUnlit = IsUnlit();
+			auto oriScale = transform->GetScale();
+
+			SetUnlit(true);
+			transform->SetScale(oriScale * 1.08);
+			const SHADER_STD_TRANSF outlineTransformation(transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
+			transform->SetScale(oriScale);
+
+			vs->WriteCB(m_graphic->DContext(), 0, &outlineTransformation);
+			m_mesh->Apply(m_graphic);
+
+			SetUnlit(oriUnlit);
+		}
+		else
+		{
+			dsState->Apply(m_graphic);
+			m_mesh->Apply(m_graphic);
+		}
 	}
 
 }
@@ -232,11 +283,14 @@ bool Object::IsInsideFrustum(const Frustum* frustum) const
 		IntersectInPlaneSphere(frustum->back, bound));
 }
 
-bool Object::IsPicking(Geometrics::Ray ray) const
+bool Object::IsPicking(Geometrics::Ray ray, DirectX::XMFLOAT3& hit) const
 {
-	if(!m_collider)
+	if (!m_collider)
+	{
+		hit = transform->GetPos();
 		return IntersectRaySphere(ray, bound);
+	}
 
-	XMFLOAT3 hit;
 	return m_collider->IsHit(ray, &hit);
 }
+

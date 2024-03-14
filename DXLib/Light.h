@@ -23,14 +23,14 @@ struct SHADER_SPOT_LIGHT;
 		DirectX::XMFLOAT3 specular;
 		ID3D11Buffer* m_cb;
 
-		Light(const Graphic* graphic, int id, ActorKind lightKind);
+		Light(const Graphic* graphic, int index, ActorKind lightKind);
 
 
 	public:
-		const int m_id;
+		const int m_index;
 
 
-		int ID() { return m_id; }
+		int ID() { return m_index; }
 		const DirectX::XMFLOAT3& GetAmbient() { return ambient; }
 		const DirectX::XMFLOAT3& GetDiffuse() { return diffuse; }
 		const DirectX::XMFLOAT3& GetSpecular() { return specular; }

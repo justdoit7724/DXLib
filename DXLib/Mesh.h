@@ -39,6 +39,7 @@ namespace DX {
 		void SetVertex(int i, Vertex v);
 		void SetPos(int i, DirectX::XMFLOAT3 pos);
 		void SetColor(int i, DirectX::XMFLOAT4 col);
+		void SetColor(DirectX::XMFLOAT4 col);
 		Vertex GetVertex(int i) const;
 		void Clear();
 

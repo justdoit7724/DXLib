@@ -75,6 +75,8 @@ S
 #define LEFT XMFLOAT3(-1,0,0)
 #define UP XMFLOAT3(0,1,0)
 #define DOWN XMFLOAT3(0,-1,0)
+#define ORIGIN XMFLOAT3(0,0,0)
+#define NOWHERE XMFLOAT3(FLT_MAX,FLT_MAX,FLT_MAX)
 
 #define COLOR_RED XMFLOAT4(1.0,0.0,0.0,1.0)
 #define COLOR_GREEN XMFLOAT4(0.0,1.0,0.0,1.0)
@@ -217,6 +219,11 @@ assert(SUCCEEDED(r))
 		output.y = v.y * f;
 		output.z = v.z * f;
 		return output;
+	}
+
+	inline float SqrLength(XMFLOAT3 v)
+	{
+		return v.x * v.x + v.y * v.y + v.z * v.z;
 	}
 
 }

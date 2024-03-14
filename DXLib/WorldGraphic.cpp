@@ -11,14 +11,13 @@ WorldGraphic::WorldGraphic(HWND hwnd, int msaa)
 {
 	Actor* tmp;
 	CreateActor(ActorKind::Camera, &tmp);
-	SetMainCamera(tmp);
+	SetMainCamera((Camera*)tmp);
 	Camera* cam = (Camera*)tmp;
 	cam->transform->SetTranslation(0, 0, -10);
 	CreateActor(ActorKind::Light_Direction, &tmp);
 	DirectionalLight* light;
 	light = (DirectionalLight*)tmp;
 	light->SetDir(Normalize(XMFLOAT3(1, -1, 1)));
-	CreateActor(ActorKind::Object, &tmp);
 
 
 }

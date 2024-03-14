@@ -42,6 +42,16 @@ void DX::Mesh::SetColor(int i, XMFLOAT4 col)
 	m_updated = false;
 }
 
+void DX::Mesh::SetColor(DirectX::XMFLOAT4 col)
+{
+	for (int i = 0; i < m_vertice.size(); ++i)
+	{
+		m_vertice[i].color = col;
+	}
+
+	m_updated = false;
+}
+
 Vertex DX::Mesh::GetVertex(int i) const
 {
 	return m_vertice[i];

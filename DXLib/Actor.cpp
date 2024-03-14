@@ -3,7 +3,8 @@
 
 using namespace DX;
 
-Actor::Actor(const Graphic* graphic, ActorKind kind)
+
+DX::Actor::Actor(const Graphic* graphic, ActorKind kind)
 	:m_graphic(graphic), m_isRelease(false), m_kind(kind), m_enable(true)
 {
 	
