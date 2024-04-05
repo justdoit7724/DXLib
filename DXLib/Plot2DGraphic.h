@@ -24,6 +24,7 @@ namespace DX
         void ClearPlot();
         void ClearScatter();
         void ClearAxis();
+        void ClearSurface();
         void EnableXUnit(bool enable);
         void EnableYUnit(bool enable);
 

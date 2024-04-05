@@ -226,6 +226,19 @@ void DX::Plot2DGraphic::ClearAxis()
 	}
 }
 
+void DX::Plot2DGraphic::ClearSurface()
+{
+	m_surfaceX.clear();
+	m_surfaceY.clear();
+	m_surfaceCol.clear();
+
+	if (m_surfaceObj)
+	{
+		m_surfaceObj->Release();
+		m_surfaceObj = nullptr;
+	}
+}
+
 void DX::Plot2DGraphic::EnableXUnit(bool enable)
 {
 	for (int i = 0; i < m_axisHorUnits.size(); ++i)
