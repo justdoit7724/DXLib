@@ -111,7 +111,9 @@ bool Shader::CheckCBSlot(UINT slot)
 VShader::VShader(ID3D11Device* device, std::string fileName, const D3D11_INPUT_ELEMENT_DESC * layoutDesc, UINT layoutNum)
 {
 	ID3DBlob* vsBlob;
-	std::wstring finalPath = ShaderPath() + std::wstring(fileName.begin(), fileName.end());
+
+
+	std::wstring finalPath = GetEXEPath() + std::wstring(fileName.begin(), fileName.end());
 	HRESULT hr = D3DReadFileToBlob(
 		finalPath.c_str(),
 			&vsBlob);
@@ -188,7 +190,7 @@ GShader::GShader(ID3D11Device* device, std::string fileName)
 		ID3DBlob* blob;
 
 		HRESULT hr = D3DReadFileToBlob(
-			(ShaderPath() + wGS).c_str(),
+			(GetEXEPath()+wGS).c_str(),
 				&blob);
 		r_assert(hr);
 		hr = device->CreateGeometryShader(
@@ -255,7 +257,7 @@ PShader::PShader(ID3D11Device* device, std::string fileName)
 		std::wstring wPS(fileName.begin(), fileName.end());
 		ID3DBlob* psBlob;
 		HRESULT hr = D3DReadFileToBlob(
-			(ShaderPath() + wPS).c_str(),
+			(GetEXEPath()+wPS).c_str(),
 			&psBlob);
 		r_assert(hr);
 		hr = device->CreatePixelShader(
@@ -313,7 +315,7 @@ CShader::CShader(ID3D11Device* device, const std::string CSfileName)
 	ID3DBlob* csBlob;
 
 	HRESULT hr=	D3DReadFileToBlob(
-		(ShaderPath() + wCS).c_str(),
+		(GetEXEPath()+wCS).c_str(),
 			&csBlob);
 	r_assert(hr);
 	hr = device->CreateComputeShader(
@@ -375,7 +377,7 @@ HShader::HShader(ID3D11Device* device, std::string fileName)
 	ID3DBlob* blob;
 
 	HRESULT hr =D3DReadFileToBlob(
-		(ShaderPath() + wCS).c_str(),
+		(GetEXEPath()+wCS).c_str(),
 			&blob);
 	r_assert(hr);
 
@@ -437,7 +439,7 @@ DShader::DShader(ID3D11Device* device, std::string fileName)
 	ID3DBlob* blob;
 
 	HRESULT hr = D3DReadFileToBlob(
-		(ShaderPath() + wCS).c_str(),
+		(GetEXEPath()+wCS).c_str(),
 			&blob);
 	r_assert(hr);
 

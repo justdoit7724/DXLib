@@ -20,9 +20,9 @@ inline void Subdivide(std::vector<XMFLOAT3>& vertice, std::vector<int>& indice)
 		XMFLOAT3 v2 = tempVertice[tempIndice[i + 1]];
 		XMFLOAT3 v3 = tempVertice[tempIndice[i + 2]];
 
-		XMFLOAT3 nv1 = Normalize( v1+ v3 * 2);
-		XMFLOAT3 nv2 = Normalize( v1+ v2 * 2);
-		XMFLOAT3 nv3 = Normalize( v3+ v2 * 2);
+		XMFLOAT3 nv1 = Normalize( (v1+ v3) / 2)/2;
+		XMFLOAT3 nv2 = Normalize( (v1+ v2) / 2)/2;
+		XMFLOAT3 nv3 = Normalize( (v3+ v2) / 2)/2;
 
 
 		// compute 3 new vertices by spliting half on each edge
@@ -55,21 +55,20 @@ SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision)
 	numSubDivision = fminf(numSubDivision, 3u);
 
 	// Approximate a sphere by tessellating an icosahedron. 
-	const float X = 0.525731f;
-	const float Z = 0.850651f;
+	const auto stdPt = Normalize(XMFLOAT3(0.525731f,0, 0.850651f))/2;
 	XMFLOAT3 pos[12] = {
-		XMFLOAT3(-X, 0.0f, Z),
-		XMFLOAT3(X, 0.0f, Z),
-		XMFLOAT3(-X, 0.0f, -Z),
-		XMFLOAT3(X, 0.0f, -Z),
-		XMFLOAT3(0.0f, Z, X),
-		XMFLOAT3(0.0f, Z, -X),
-		XMFLOAT3(0.0f, -Z, X),
-		XMFLOAT3(0.0f, -Z, -X),
-		XMFLOAT3(Z, X, 0.0f),
-		XMFLOAT3(-Z, X, 0.0f),
-		XMFLOAT3(Z, -X, 0.0f),
-		XMFLOAT3(-Z, -X, 0.0f)
+		XMFLOAT3(-stdPt.x, 0.0f, stdPt.z),
+		XMFLOAT3(stdPt.x, 0.0f, stdPt.z),
+		XMFLOAT3(-stdPt.x, 0.0f, -stdPt.z),
+		XMFLOAT3(stdPt.x, 0.0f, -stdPt.z),
+		XMFLOAT3(0.0f, stdPt.z, stdPt.x),
+		XMFLOAT3(0.0f, stdPt.z, -stdPt.x),
+		XMFLOAT3(0.0f, -stdPt.z, stdPt.x),
+		XMFLOAT3(0.0f, -stdPt.z, -stdPt.x),
+		XMFLOAT3(stdPt.z, stdPt.x, 0.0f),
+		XMFLOAT3(-stdPt.z, stdPt.x, 0.0f),
+		XMFLOAT3(stdPt.z, -stdPt.x, 0.0f),
+		XMFLOAT3(-stdPt.z, -stdPt.x, 0.0f)
 	};
 	UINT k[60] = {
 		1,4,0, 4,9,0,
@@ -111,7 +110,7 @@ SphereMesh::SphereMesh(ID3D11Device* device, int numSubDivision)
 			-sinf(theta)
 		);*/
 
-		m_vertice[i].pos = Div(pos, 2.0);
+		m_vertice[i].pos = pos;
 
 		m_vertice[i].tex= tex;
 		

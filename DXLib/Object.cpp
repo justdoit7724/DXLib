@@ -68,7 +68,7 @@ Object::Object(ID3D11Device* device, ID3D11DeviceContext* dContext, std::string 
 */
 
 DX::Object::Object(Graphic* graphic)
-	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false), m_outlineMode(false), m_collider(nullptr)
+	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false), m_outlineMode(false), m_collider(nullptr), m_meshOutline(nullptr), m_enablePick(true)
 {
 	transform = new Transform();
 	auto layout = graphic->GetLayout();
@@ -87,10 +87,11 @@ DX::Object::Object(Graphic* graphic)
 	rsState = new RasterizerState(graphic->Device(), nullptr);
 
 	D3D11_DEPTH_STENCIL_DESC outlineMaskDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
+	outlineMaskDesc.DepthFunc = D3D11_COMPARISON_NEVER;
 	outlineMaskDesc.StencilEnable = true;
 	outlineMaskDesc.StencilWriteMask = 0xff;
 	outlineMaskDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	outlineMaskDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+	outlineMaskDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_REPLACE;
 	m_outlineMaskDSState = new DepthStencilState(graphic->Device(), &outlineMaskDesc);
 	D3D11_DEPTH_STENCIL_DESC outlineRenderDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
 	outlineRenderDesc.DepthEnable = false;
@@ -145,7 +146,7 @@ void Object::UpdateCollider()
 
 	m_collider->Translate(transform->GetPos());
 	m_collider->SetRotate(transform->GetForward(), transform->GetUp());
-	m_collider->SetScale(transform->GetScale());
+	//m_collider->SetScale(transform->GetScale());
 }
 
 Geometrics::Sphere DX::Object::Bound()
@@ -195,6 +196,8 @@ void DX::Object::SetShape(Mesh* shape)
 		delete m_mesh;
 
 	m_mesh = shape;
+
+	m_meshOutline = new Mesh(shape);
 }
 
 void DX::Object::SetCollider(Collider* collider)
@@ -203,6 +206,11 @@ void DX::Object::SetCollider(Collider* collider)
 		delete m_collider;
 
 	m_collider = collider;
+}
+
+void DX::Object::SetOutlineColor(DirectX::XMFLOAT4 color)
+{
+	m_meshOutline->SetColor(color);
 }
 
 
@@ -216,7 +224,6 @@ void Object::Visualize()
 
 void Object::Render()
 {
-
 	if (!m_enable)
 		return;
 
@@ -238,33 +245,38 @@ void Object::Render()
 		rsState->Apply(m_graphic);
 
 
-		if (m_outlineMode)
+
+		if (m_outlineMode)//pass1
 		{
-			//pass1
 			m_outlineMaskDSState->Apply(m_graphic);
 			m_mesh->Apply(m_graphic);
+		}
 
-			//pass2
+		dsState->Apply(m_graphic);
+		m_mesh->Apply(m_graphic);
+
+		if (m_outlineMode)//pass2
+		{
+			
 			m_outlineRenderDSState->Apply(m_graphic);
 
 			auto oriUnlit = IsUnlit();
 			auto oriScale = transform->GetScale();
 
 			SetUnlit(true);
-			transform->SetScale(oriScale * 1.08);
+			transform->SetScale(oriScale * 1.05);
 			const SHADER_STD_TRANSF outlineTransformation(transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
 			transform->SetScale(oriScale);
 
 			vs->WriteCB(m_graphic->DContext(), 0, &outlineTransformation);
-			m_mesh->Apply(m_graphic);
+			m_meshOutline->Apply(m_graphic);
 
 			SetUnlit(oriUnlit);
+
+
 		}
-		else
-		{
-			dsState->Apply(m_graphic);
-			m_mesh->Apply(m_graphic);
-		}
+
+		//m_graphic->DContext()->ClearDepthStencilView(m_graphic->DSV(), D3D11_CLEAR_STENCIL, NULL, 0);
 	}
 
 }
@@ -283,8 +295,17 @@ bool Object::IsInsideFrustum(const Frustum* frustum) const
 		IntersectInPlaneSphere(frustum->back, bound));
 }
 
+
+void DX::Object::EnablePick(bool enable)
+{
+	m_enablePick = enable;
+}
+
 bool Object::IsPicking(Geometrics::Ray ray, DirectX::XMFLOAT3& hit) const
 {
+	if (!m_enablePick)
+		return false;
+
 	if (!m_collider)
 	{
 		hit = transform->GetPos();

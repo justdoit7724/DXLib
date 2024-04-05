@@ -34,11 +34,12 @@ namespace DX {
 		DepthStencilState* dsState = nullptr;
 		Collider* m_collider;
 		bool m_isUnlit;
+		bool m_enablePick;
 
 		//outline
 		DepthStencilState* m_outlineMaskDSState = nullptr;
 		DepthStencilState* m_outlineRenderDSState = nullptr;
-
+		Mesh* m_meshOutline;
 
 	public:
 
@@ -48,6 +49,7 @@ namespace DX {
 		void Update() override;
 		void Render() override;
 	
+		void EnablePick(bool enable);
 		virtual bool IsPicking(Geometrics::Ray ray, DirectX::XMFLOAT3& hit)const;
 		virtual void UpdateBound();
 		virtual void UpdateCollider();
@@ -65,7 +67,9 @@ namespace DX {
 		void SetCollider(Collider* collider);
 		Transform* GetTransform() { return transform; }
 		Mesh* GetShape() { return m_mesh; }
+		Collider* GetCollider() { return m_collider; }
 
+		void SetOutlineColor(DirectX::XMFLOAT4 color);
 		bool m_outlineMode;
 
 		SHADER_MATERIAL* m_material;
@@ -75,6 +79,8 @@ namespace DX {
 		void Visualize() override;
 
 		virtual bool IsInsideFrustum(const Frustum* frustum) const;
+
+		void SetRenderStep(signed int step);
 
 		int layer;
 

@@ -5,12 +5,15 @@
 
 using namespace DX;
 
-Text::Text(const Graphic* graphic)
-	:Actor(graphic, ActorKind::Text)
-{
-		m_spriteFont = new SpriteFont(graphic->Device(), __FILE__ L"\\..\\DirectXTK\\Font\\Font.spritefont");
+#define TEXT_ALIGN_MARGIN_X 7
+#define TEXT_ALIGN_MARGIN_Y 18
 
-		m_spriteBatch = new SpriteBatch(graphic->DContext());
+Text::Text(const Graphic* graphic)
+	:Actor(graphic, ActorKind::Text), m_align(Left)
+{
+	m_spriteFont = new SpriteFont(graphic->Device(), __FILE__ L"\\..\\DirectXTK\\Font\\Font.spritefont");
+
+	m_spriteBatch = new SpriteBatch(graphic->DContext());
 
 	m_x = 0;
 	m_y = 0;
@@ -18,6 +21,11 @@ Text::Text(const Graphic* graphic)
 	m_scaleX = 1;
 	m_scaleY = 1;
 	SetColor(0, 0, 0);
+}
+
+void Text::SetAlign(Align align)
+{
+	m_align = align;
 }
 
 void Text::SetStr(std::string str)
@@ -79,6 +87,20 @@ void Text::Render()
 			width / 2.0f, height / 2.0f, 0, 1);
 
 		textPos = Multiply(textPos, textMat);
+	}
+
+	textPos.x += m_scaleX * TEXT_ALIGN_MARGIN_X;
+	textPos.y += m_scaleY * TEXT_ALIGN_MARGIN_Y;
+	switch (m_align)
+	{
+		case Left:
+			break;
+		case Center:
+			textPos.x -= m_scaleX * TEXT_ALIGN_MARGIN_X * m_str.size();
+			break;
+		case Right:
+			textPos.x -= m_scaleX * TEXT_ALIGN_MARGIN_X*2 * m_str.size();
+			break;
 	}
 
 	m_spriteFont->DrawString(

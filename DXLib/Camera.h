@@ -52,8 +52,9 @@ namespace DX
 	public:
 		~Camera();
 		void SetFrame(const FRAME_KIND fKind, DirectX::XMFLOAT2 orthoSize, const float nearPlane, const float farPlane, const float verticalViewAngle, const float aspectRatio);
+		void SetScale(float scale);
+		float GetScale();
 		void Update() override;
-		void SetProj(DirectX::XMMATRIX mat);
 
 		const DirectX::XMMATRIX& VMat()const { return viewMat; }
 		const DirectX::XMMATRIX& ProjMat()const { return projMat; }
@@ -70,8 +71,11 @@ namespace DX
 		Transform* transform;
 
 
+
 	private:
 		void SetView();
+		void SetProj();
+
 		DirectX::XMMATRIX projMat;
 		DirectX::XMMATRIX viewMat;
 
@@ -80,6 +84,7 @@ namespace DX
 		float n, f;
 		float verticalRadian;
 		float aspectRatio;
+		float m_scale;
 
 		Frustum frustum;
 		int layer = LAYER_ALL;

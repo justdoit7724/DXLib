@@ -16,7 +16,8 @@ namespace DX
         void Update(float spf) override;
 
         void Plot(std::vector<DirectX::XMFLOAT3> pt, DirectX::XMFLOAT4 color);
-        void Scatter(std::vector<DirectX::XMFLOAT3> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT4> colors);
+        std::vector<Object*> Scatter(std::vector<DirectX::XMFLOAT3> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT4> colors);
+        std::vector<Object*> Scatter(std::vector<DirectX::XMFLOAT3> pt, float rad, DirectX::XMFLOAT4 color);
         void Surface(std::vector<std::vector<float>> x1, std::vector<std::vector<float>> x2, std::vector<std::vector<float>> v, float colRangeBegin, float colRangeEnd);
         void ClearScatters();   
         void ClearSurface();
@@ -25,10 +26,15 @@ namespace DX
         void Clear();
         void SetX1Title(std::string title);
         void SetX2Title(std::string title);
+        DirectX::XMFLOAT3 WPos2PlotPos(DirectX::XMFLOAT3 actPos);
+
+        DirectX::XMFLOAT3 GetOrigin();
+        DirectX::XMFLOAT3 GetPlotSize();
 
     private:
         void UpdateCamMovement(float spf)override;
         void UpdatePlot();
+
 
         Object* m_axisPX;
         Object* m_axisNX;
@@ -36,9 +42,12 @@ namespace DX
         Object* m_axisNZ;
         Object* m_axisB;
 
-        std::vector<std::vector<DirectX::XMFLOAT3>> m_scattersPt;
-        std::vector<std::vector<float>> m_scattersRad;
-        std::vector<std::vector<DirectX::XMFLOAT4>> m_scattersCol;
+        DirectX::XMFLOAT3 m_wOrigin;
+        DirectX::XMFLOAT3 m_wSize;
+
+        std::vector<DirectX::XMFLOAT3> m_scattersPt;
+        std::vector<float> m_scattersRad;
+        std::vector<DirectX::XMFLOAT4> m_scattersCol;
         std::vector<Object*> m_scattersObj;
 
         std::vector<std::vector<float>> m_surfaceX1;
