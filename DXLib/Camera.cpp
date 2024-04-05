@@ -6,11 +6,13 @@
 #include "Buffer.h"
 #include "ShaderReg.h"
 
-#define Z_ORDER_MAX 5
 using namespace DX;
 
+#define CAM_SCALE_MIN 0.1
+#define CAM_SCALE_MAX 2.3
+
 Camera::Camera(const Graphic* graphic, FRAME_KIND frameKind, float orthoScnWidth, float orthoScnHeight, float n, float f, float verticalViewRad, float aspectRatio, bool skipFrustum)
-	:Actor(graphic, ActorKind::Camera)
+	:Actor(graphic, ActorKind::Camera), m_scale(1)
 {
 	transform = new Transform();
 
@@ -37,36 +39,14 @@ void Camera::SetFrame(const FRAME_KIND fKind, XMFLOAT2 orthoSize, const float n,
 	this->verticalRadian = verticalViewRad;
 	this->aspectRatio = aspectRatio;
 
-	float interval = 1.0f / Z_ORDER_MAX;
-	assert(Z_ORDER_MAX >= 1);
-	switch (fKind)
-	{
-	case FRAME_KIND_PERSPECTIVE:
-	{
-		float sX = 1.0f / (aspectRatio * tan(verticalViewRad * 0.5f));
-		float sY = 1.0f / tan(verticalViewRad * 0.5f);
-		projMat = XMMATRIX(
-			sX, 0, 0, 0,
-			0, sY, 0, 0,
-			0, 0, f / (f - n), 1,
-			0, 0, -n * f / (f - n), 0);
-	}
-		break;
-	case FRAME_KIND_ORTHOGONAL:
-	{
-		float sX = 2.0f / m_size.x;
-		float sY = 2.0f / m_size.y;
-		projMat = XMMATRIX(
-			sX, 0, 0, 0,
-			0, sY, 0, 0,
-			0, 0, 1.0f/(f-n), 0,
-			0, 0, -n / (f - n), 1
-		);
-	}
-		break;
-	}
-	
+	SetProj();
 }
+
+void DX::Camera::SetScale(float scale)
+{
+	m_scale = DX::Clamp(CAM_SCALE_MIN, CAM_SCALE_MAX, scale);
+}
+
 
 void Camera::SetView()
 {
@@ -86,9 +66,39 @@ void Camera::SetView()
 		x, y, z, 1);
 }
 
-void Camera::SetProj(XMMATRIX mat)
+void DX::Camera::SetProj()
 {
-	projMat = mat;
+	switch (curFrame)
+	{
+	case FRAME_KIND_PERSPECTIVE:
+	{
+		float sX = 1.0f / (aspectRatio * tan(verticalRadian * m_scale * 0.5f));
+		float sY = 1.0f / tan(verticalRadian * m_scale * 0.5f);
+		projMat = XMMATRIX(
+			sX, 0, 0, 0,
+			0, sY, 0, 0,
+			0, 0, f / (f - n), 1,
+			0, 0, -n * f / (f - n), 0);
+	}
+	break;
+	case FRAME_KIND_ORTHOGONAL:
+	{
+		float sX = m_scale * 2.0f / m_size.x;
+		float sY = m_scale * 2.0f / m_size.y;
+		projMat = XMMATRIX(
+			sX, 0, 0, 0,
+			0, sY, 0, 0,
+			0, 0, 1.0f / (f - n), 0,
+			0, 0, -n / (f - n), 1
+		);
+	}
+	break;
+	}
+}
+
+float DX::Camera::GetScale()
+{
+	return m_scale;
 }
 
 void Camera::Update()
@@ -119,7 +129,7 @@ void Camera::Update()
 	}
 
 	SetView();
-
+	SetProj();
 
 	XMFLOAT3 pos = transform->GetPos();
 	m_cbPos->Write(m_graphic->DContext(), &pos);

@@ -81,14 +81,6 @@ namespace DX {
 		out.z = a.z - v;
 		return out;
 	}
-	XMFLOAT3 Div(XMFLOAT3 a, float v)
-	{
-		XMFLOAT3 out;
-		out.x = a.x / v;
-		out.y = a.y / v;
-		out.z = a.z / v;
-		return out;
-	}
 	bool Equal(XMFLOAT3 a, XMFLOAT3 b)
 	{
 		float eps = 1.0e-8;
@@ -232,13 +224,13 @@ namespace DX {
 
 		if (t < 0.5)
 		{
-			b = Lerp(1, 0, t*2);
-			g = 1 - b;
+			r = Lerp(1, 0, t * 2);
+			g = 1 - r;
 		}
 		else
 		{
-			r = Lerp(0, 1, (t-0.5)*2);
-			g = 1 - r;
+			b = Lerp(0, 1, (t - 0.5) * 2);
+			g = 1 - b;
 		}
 
 		return { r, g, b };

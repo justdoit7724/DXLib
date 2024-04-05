@@ -283,12 +283,6 @@
     <FxCompile Include="StdVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="Plot2DVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="Plot2DPS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderSampPoint.cginc">

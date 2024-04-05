@@ -18,7 +18,7 @@ namespace DX {
 
 
 	Graphic::Graphic(HWND _hwnd, int msaa)
-		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false), m_hwnd(_hwnd), m_curPicked(nullptr)
+		:m_mainCamera(nullptr), m_mouseLClicked(false), m_mouseRClicked(false),m_mouseX(0), m_mouseY(0), m_enableCamMovement(false), m_hwnd(_hwnd), m_curPicked(nullptr),m_camAngleX(0),m_camAngleY(0)
 	{
 		assert(msaa == 1 || msaa == 2 || msaa == 4 || msaa == 8 || msaa == 16);
 
@@ -159,12 +159,15 @@ namespace DX {
 		samp->Release();
 #pragma endregion
 
+		m_bkgColor = { 0,0,0,0 };
+
 
 		m_vertLayout.push_back({"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0});
 		m_vertLayout.push_back({"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 		m_vertLayout.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 		m_vertLayout.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 		
+		m_prevMousePt = XMFLOAT2(0, 0);
 	}
 
 	Graphic::~Graphic()
@@ -191,7 +194,8 @@ namespace DX {
 			m_pickHit = NOWHERE;
 			m_curPicked = nullptr;
 			float closestDist = FLT_MAX;
-			for (auto a : m_actors.at(ActorKind::Object))
+			
+			for (auto a : m_actors[ActorKind::Object])
 			{
 				Object* obj = (Object*)a;
 				XMFLOAT3 hit;
@@ -211,7 +215,7 @@ namespace DX {
 		}
 
 		//main loop
-		for (auto it = m_actors.begin(); it!=m_actors.end(); ++it)
+		for (auto it = m_actors.begin(); it!=m_actors.end();)
 		{
 			if (it->second.empty())
 			{
@@ -236,16 +240,25 @@ namespace DX {
 					i++;
 			}
 
-
-			for (int i = 0; i < it->second.size(); i++)
+			for (int p = 0; p < 5; ++p)
 			{
-				it->second[i]->Update();
+				for (int i = 0; i < it->second.size(); i++)
+				{
+					if(it->second[i]->m_priority == p)
+						it->second[i]->Update();
+				}
 			}
-			for (int i = 0; i < it->second.size();i++)
+			for (int p = 0; p < 5; ++p)
 			{
-				it->second[i]->Render();
+				for (int i = 0; i < it->second.size(); i++)
+				{
+					if (it->second[i]->m_priority == p)
+						it->second[i]->Render();
+				}
 			}
 			
+
+			++it;
 
 		}
 
@@ -257,7 +270,7 @@ namespace DX {
 
 		m_swapchain->Present(1, 0);
 
-		const float black[4] = { 1,1,1,0 };
+		const float black[4] = { m_bkgColor.x,m_bkgColor.y,m_bkgColor.z,0 };
 		m_dContext->ClearRenderTargetView(m_rtv, black);
 		m_dContext->ClearDepthStencilView(m_dsView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
@@ -273,7 +286,7 @@ namespace DX {
 	{
 		return m_dContext;
 	}
-	ID3D11Texture2D* Graphic::DepthBuffer()
+	ID3D11Texture2D* Graphic::DepthBuffer()const
 	{
 		return m_depthStencilBuffer;
 	}
@@ -281,7 +294,7 @@ namespace DX {
 	{
 		return m_backBuffer;
 	}
-	ID3D11DepthStencilView* Graphic::DSV()
+	ID3D11DepthStencilView* Graphic::DSV()const
 	{
 		return m_dsView;
 	}
@@ -298,8 +311,13 @@ namespace DX {
 	RECT Graphic::GetWndSize() const
 	{
 		RECT rc;
-		GetClientRect(m_hwnd, &rc);
+		GetWindowRect(m_hwnd, &rc);
 		return rc;
+	}
+
+	void Graphic::SetBackgroundColor(DirectX::XMFLOAT4 color)
+	{
+		m_bkgColor = color;
 	}
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> Graphic::GetLayout()
@@ -327,8 +345,7 @@ namespace DX {
 		case ActorKind::Camera:
 
 		{
-			RECT rc;
-			GetClientRect(m_hwnd, &rc);
+			RECT rc=GetWndSize();
 			*out = new Camera(this, FRAME_KIND_PERSPECTIVE, rc.right-rc.left, rc.bottom-rc.top, 1.0f, 1000.0f, XM_PIDIV2, 1, true);
 
 			if (!m_mainCamera)
@@ -443,6 +460,16 @@ namespace DX {
 		m_mouseY = y;
 	}
 
+	void Graphic::MouseWheel(int delta)
+	{
+		if (MainCamera())
+		{
+			float scale = MainCamera()->GetScale();
+			scale += delta>0? -0.05:0.05;
+			MainCamera()->SetScale(scale);
+		}
+	}
+
 	Object* Graphic::PickObj(DirectX::XMFLOAT3* hit) const
 	{
 		if (hit)
@@ -450,6 +477,20 @@ namespace DX {
 
 		return m_curPicked;
 	}
+
+	XMFLOAT2 Graphic::Dir2Screen(DirectX::XMFLOAT3 dir)
+	{
+		auto vdir = MultiplyDir(dir, MainCamera()->VMat());
+
+		auto rc = GetWndSize();
+		auto hw = (rc.right - rc.left)/2.0f;
+		auto hh = (rc.bottom - rc.top)/2.0f;
+		auto scn3DDir = Normalize({ vdir.x* hw,vdir.y * hh,0 });
+
+
+		return { scn3DDir.x, -scn3DDir.y };
+	}
+
 
 	void Graphic::UpdateCamMovement(float spf)
 	{
@@ -478,18 +519,15 @@ namespace DX {
 
 				newPos = XMFLOAT3(newPos.x + forward.x * speed * spf, newPos.y + forward.y * speed * spf, newPos.z + forward.z * speed * spf);
 			}
-			static float angleX = 0;
-			static float angleY = 0;
-			static XMFLOAT2 prevMousePt;
 			const float angleSpeed = 3.141592f * 0.2f;
 			if (m_mouseRClicked)
 			{
-				angleY += angleSpeed * spf * (m_mouseX - prevMousePt.x);
-				angleX += angleSpeed * spf * (m_mouseY - prevMousePt.y);
+				m_camAngleY += angleSpeed * spf * (m_mouseX - m_prevMousePt.x);
+				m_camAngleX += angleSpeed * spf * (m_mouseY - m_prevMousePt.y);
 			}
-			prevMousePt.x = m_mouseX;
-			prevMousePt.y = m_mouseY;
-			const XMMATRIX rotMat = XMMatrixRotationX(angleX) * XMMatrixRotationY(angleY);
+			m_prevMousePt.x = m_mouseX;
+			m_prevMousePt.y = m_mouseY;
+			const XMMATRIX rotMat = XMMatrixRotationX(m_camAngleX) * XMMatrixRotationY(m_camAngleY);
 			cam->transform->SetTranslation(newPos);
 			XMFLOAT3 f = DX::MultiplyDir(FORWARD, rotMat);
 			XMFLOAT3 u = DX::MultiplyDir(UP, rotMat);

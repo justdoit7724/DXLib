@@ -89,14 +89,6 @@ namespace DX {
 		return sum;
 	}
 
-	DirectX::XMFLOAT3 operator/(DirectX::XMFLOAT3 v, float f)
-	{
-		DirectX::XMFLOAT3 sum;
-		sum.x = v.x / f;
-		sum.y = v.y / f;
-		sum.z = v.z / f;
-		return sum;
-	}
 
 	void operator/=(XMFLOAT4& v, float f)
 	{
@@ -152,7 +144,6 @@ namespace DX {
 	bool DXLIB_DLL Equal(DirectX::XMFLOAT2 a, DirectX::XMFLOAT2 b);
 	DirectX::XMFLOAT3 DXLIB_DLL Add(DirectX::XMFLOAT3 a, float v);
 	DirectX::XMFLOAT3 DXLIB_DLL Sub(DirectX::XMFLOAT3 a, float v);
-	DirectX::XMFLOAT3 DXLIB_DLL Div(DirectX::XMFLOAT3 a, float v);
 	bool DXLIB_DLL Equal(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
 	DirectX::XMFLOAT3 DXLIB_DLL Neg(DirectX::XMFLOAT3 a);
 	DirectX::XMFLOAT4 DXLIB_DLL Div(DirectX::XMFLOAT4 a, float v);

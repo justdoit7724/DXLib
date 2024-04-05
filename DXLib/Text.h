@@ -10,8 +10,18 @@ namespace DX
         public Actor
     {
     public:
+
+        enum Align
+        {
+            Left,
+            Center,
+            Right
+        };
+
+
         Text(const Graphic* graphic);
 
+        void SetAlign(Align align);
         void SetStr(std::string str);
         void SetPos(float x, float y, float z=0);
         void SetColor(float r, float g, float b);
@@ -22,6 +32,7 @@ namespace DX
 
     private:
         std::string m_str;
+        Align m_align;
         float m_x;
         float m_y;
         float m_z;

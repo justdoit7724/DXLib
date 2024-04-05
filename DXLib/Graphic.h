@@ -21,12 +21,13 @@ namespace DX
 		void BindView();
 		ID3D11Device* Device() const ;
 		ID3D11DeviceContext* DContext() const ;
-		ID3D11Texture2D* DepthBuffer();
+		ID3D11Texture2D* DepthBuffer()const ;
 		ID3D11Texture2D* BackBuffer();
-		ID3D11DepthStencilView* DSV();
+		ID3D11DepthStencilView* DSV()const;
 		ID3D11RenderTargetView* RTV();
 		HWND GetHWND() const;
 		RECT GetWndSize() const;
+		void SetBackgroundColor(DirectX::XMFLOAT4 color);
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> GetLayout();
 
@@ -42,8 +43,12 @@ namespace DX
 		void MouseLClick(bool click = true);
 		void MouseRClick(bool click = true);
 		void MousePT(float x, float y);
+		void MouseWheel(int delta);
+		float m_camAngleX;
+		float m_camAngleY;
 
 		Object* PickObj(DirectX::XMFLOAT3* hit) const;
+		DirectX::XMFLOAT2 Dir2Screen(DirectX::XMFLOAT3 dir);
 
 	protected:
 		Graphic() = delete;
@@ -60,12 +65,14 @@ namespace DX
 		ID3D11RenderTargetView* m_rtv;
 		ID3D11DepthStencilView* m_dsView;
 		ID3D11RasterizerState* m_rasterizerState;
+		DirectX::XMFLOAT4 m_bkgColor;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> m_vertLayout;
 
 		std::unordered_map<ActorKind, std::vector<Actor*>> m_actors;
 
 		Camera* m_mainCamera;
+		DirectX::XMFLOAT2 m_prevMousePt;
 
 		Object* m_curPicked;
 		DirectX::XMFLOAT3 m_pickHit;
@@ -76,6 +83,8 @@ namespace DX
 		bool m_mouseRClicked;
 		float m_mouseX;
 		float m_mouseY;
+
+
 
 		virtual void UpdateCamMovement(float spf);
 	};

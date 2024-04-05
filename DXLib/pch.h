@@ -221,9 +221,39 @@ assert(SUCCEEDED(r))
 		return output;
 	}
 
+	inline XMFLOAT3 operator/(DirectX::XMFLOAT3 v, float f)
+	{
+		DirectX::XMFLOAT3 sum;
+		sum.x = v.x / f;
+		sum.y = v.y / f;
+		sum.z = v.z / f;
+		return sum;
+	}
+	inline XMFLOAT3 operator/(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+	{
+		DirectX::XMFLOAT3 div;
+		div.x = a.x / b.x;
+		div.y = a.y / b.y;
+		div.z = a.z / b.z;
+		return div;
+	}
+
 	inline float SqrLength(XMFLOAT3 v)
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
+	}
+
+
+	inline std::wstring GetEXEPath()
+	{
+		wchar_t* str = new wchar_t[400];
+		GetModuleFileName(NULL, str, 400);
+
+		auto path = std::wstring(str) + L"/../";
+
+		delete[] str;
+
+		return path;
 	}
 
 }

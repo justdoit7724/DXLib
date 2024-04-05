@@ -18,6 +18,8 @@ using namespace DX;
 DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	:Graphic(hwnd,msaa), m_surfaceObj(nullptr), m_axisB(nullptr), m_axisNX(nullptr), m_axisNZ(nullptr),m_axisPX(nullptr),m_axisPZ(nullptr)
 {
+	m_bkgColor = { 1,1,1,0 };
+
 	Actor* tmp;
 	CreateActor(ActorKind::Camera, &tmp);
 	SetMainCamera((Camera*)tmp);
@@ -133,7 +135,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisB->SetShape(mesh);
 	m_axisB->SetUnlit(true);
 
-	float unitSpacing = AXIS_WIDTH / 35;
+	float unitSpacing = AXIS_WIDTH / 25;
 	for (int i = 0; i < 5; ++i)
 	{
 		CreateActor(ActorKind::Text, &tmp);
@@ -142,6 +144,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 		m_axisUnitPX.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
 		m_axisUnitPX.back()->SetScale(0.5, 0.5);
 		m_axisUnitPX.back()->SetPos(AXIS_WIDTH+ unitSpacing, 0, i * AXIS_WIDTH / 4);
+		m_axisUnitPX.back()->SetAlign(Text::Center);
 
 		CreateActor(ActorKind::Text, &tmp);
 		m_axisUnitNX.push_back((Text*)tmp);
@@ -149,6 +152,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 		m_axisUnitNX.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
 		m_axisUnitNX.back()->SetScale(0.5, 0.5);
 		m_axisUnitNX.back()->SetPos(-unitSpacing, 0, i * AXIS_WIDTH / 4);
+		m_axisUnitNX.back()->SetAlign(Text::Center);
 
 		CreateActor(ActorKind::Text, &tmp);
 		m_axisUnitPZ.push_back((Text*)tmp);
@@ -156,6 +160,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 		m_axisUnitPZ.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
 		m_axisUnitPZ.back()->SetScale(0.5, 0.5);
 		m_axisUnitPZ.back()->SetPos(i * AXIS_WIDTH / 4, 0, AXIS_WIDTH + unitSpacing);
+		m_axisUnitPZ.back()->SetAlign(Text::Center);
 
 		CreateActor(ActorKind::Text, &tmp);
 		m_axisUnitNZ.push_back((Text*)tmp);
@@ -163,6 +168,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 		m_axisUnitNZ.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
 		m_axisUnitNZ.back()->SetScale(0.5, 0.5);
 		m_axisUnitNZ.back()->SetPos(i*AXIS_WIDTH/4, 0, -unitSpacing);
+		m_axisUnitNZ.back()->SetAlign(Text::Center);
 	}
 	
 
@@ -170,26 +176,30 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	m_axisTitlePX = (Text*)tmp;
 	m_axisTitlePX->Set3D(true);
 	m_axisTitlePX->SetStr("X1");
-	m_axisTitlePX->SetScale(1.5,1.5);
+	m_axisTitlePX->SetScale(1.2,1.2);
 	m_axisTitlePX->SetPos(AXIS_WIDTH + unitSpacing*4, 0, AXIS_WIDTH / 2);
+	m_axisTitlePX->SetAlign(Text::Center);
 	CreateActor(ActorKind::Text, &tmp);
 	m_axisTitleNX = (Text*)tmp;
 	m_axisTitleNX->Set3D(true);
 	m_axisTitleNX->SetStr("X1");
-	m_axisTitleNX->SetScale(1.5, 1.5);
+	m_axisTitleNX->SetScale(1.2, 1.2);
 	m_axisTitleNX->SetPos(- unitSpacing * 4, 0, AXIS_WIDTH / 2);
+	m_axisTitleNX->SetAlign(Text::Center);
 	CreateActor(ActorKind::Text, &tmp);
 	m_axisTitlePZ = (Text*)tmp;
 	m_axisTitlePZ->Set3D(true);
 	m_axisTitlePZ->SetStr("X2");
-	m_axisTitlePZ->SetScale(1.5, 1.5);
+	m_axisTitlePZ->SetScale(1.2, 1.2);
 	m_axisTitlePZ->SetPos(AXIS_WIDTH / 2, 0, AXIS_WIDTH+  unitSpacing * 4);
+	m_axisTitlePZ->SetAlign(Text::Center);
 	CreateActor(ActorKind::Text, &tmp);
 	m_axisTitleNZ = (Text*)tmp;
 	m_axisTitleNZ->Set3D(true);
 	m_axisTitleNZ->SetStr("X2");
-	m_axisTitleNZ->SetScale(1.5, 1.5);
+	m_axisTitleNZ->SetScale(1.2, 1.2);
 	m_axisTitleNZ->SetPos(AXIS_WIDTH / 2, 0, 0 - unitSpacing * 4);
+	m_axisTitleNZ->SetAlign(Text::Center);
 
 }
 
@@ -234,13 +244,39 @@ void DX::Plot3DGraphic::Plot(std::vector<DirectX::XMFLOAT3> pt, DirectX::XMFLOAT
 	UpdatePlot();
 }
 
-void DX::Plot3DGraphic::Scatter(std::vector<XMFLOAT3> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT4> colors)
+std::vector<Object*> DX::Plot3DGraphic::Scatter(std::vector<XMFLOAT3> pt, std::vector<float> rads, std::vector<DirectX::XMFLOAT4> colors)
 {
-	m_scattersPt.push_back(pt);
-	m_scattersRad.push_back(rads);
-	m_scattersCol.push_back(colors);
+	m_scattersPt.insert(m_scattersPt.begin(), pt.begin(), pt.end());
+	m_scattersRad.insert(m_scattersRad.begin(), rads.begin(), rads.end());
+	m_scattersCol.insert(m_scattersCol.begin(), colors.begin(), colors.end());
 
 	UpdatePlot();
+
+	std::vector<Object*> curScatterObjs;
+	for (int i = 0; i < pt.size(); ++i)
+	{
+		curScatterObjs.push_back(m_scattersObj[m_scattersObj.size() - pt.size() + i]);
+	}
+	return curScatterObjs;
+}
+
+std::vector<Object*> DX::Plot3DGraphic::Scatter(std::vector<DirectX::XMFLOAT3> pt, float rad, DirectX::XMFLOAT4 color)
+{
+	m_scattersPt.insert(m_scattersPt.end(), pt.begin(), pt.end());
+	for (int i = 0; i < pt.size(); ++i)
+	{
+		m_scattersRad.push_back(rad);
+		m_scattersCol.push_back(color);
+	}
+
+	UpdatePlot();
+
+	std::vector<Object*> curScatterObjs;
+	for (int i = 0; i < pt.size(); ++i)
+	{
+		curScatterObjs.push_back(m_scattersObj[m_scattersObj.size() - pt.size() + i]);
+	}
+	return curScatterObjs;
 }
 
 void DX::Plot3DGraphic::Surface(std::vector<std::vector<float>> x1, std::vector<std::vector<float>> x2, std::vector<std::vector<float>> v, float colRangeBegin, float colRangeEnd)
@@ -329,6 +365,24 @@ void DX::Plot3DGraphic::SetX2Title(std::string title)
 	m_axisTitlePX->SetStr(title);
 }
 
+DirectX::XMFLOAT3 DX::Plot3DGraphic::WPos2PlotPos(DirectX::XMFLOAT3 wPos)
+{
+	XMFLOAT3 pPos = (wPos - ORIGIN)/ GetPlotSize();
+
+	
+	return pPos;
+}
+
+DirectX::XMFLOAT3 DX::Plot3DGraphic::GetOrigin()
+{
+	return ORIGIN;
+}
+
+DirectX::XMFLOAT3 DX::Plot3DGraphic::GetPlotSize()
+{
+	return { AXIS_WIDTH , AXIS_HEIGHT, AXIS_WIDTH };
+}
+
 
 
 
@@ -343,20 +397,17 @@ void DX::Plot3DGraphic::UpdateCamMovement(float spf)
 	const float speed = 50;
 
 
-	static float angleVer = 0;
-	static float angleHor = 0;
-	static XMFLOAT2 prevMousePt(0,0);
 	const float angleSpeed = 3.141592f * 0.15f;
 	if (m_mouseRClicked)
 	{
-		angleHor += angleSpeed * spf * (m_mouseX - prevMousePt.x);
-		angleVer += angleSpeed * spf * (m_mouseY - prevMousePt.y);
-		angleVer = Clamp(-PI*0.49, PI * 0.49, angleVer);
+		m_camAngleX += angleSpeed * spf * (m_mouseX - m_prevMousePt.x);
+		m_camAngleY += angleSpeed * spf * (m_mouseY - m_prevMousePt.y);
+		m_camAngleY = Clamp(-PI*0.49, PI * 0.49, m_camAngleY);
 	}
-	prevMousePt.x = m_mouseX;
-	prevMousePt.y = m_mouseY;
+	m_prevMousePt.x = m_mouseX;
+	m_prevMousePt.y = m_mouseY;
 	XMFLOAT3 pos(0, 0, -CAM_DIST);
-	XMMATRIX rotMat = XMMatrixRotationX(angleVer) * XMMatrixRotationY(angleHor);
+	XMMATRIX rotMat = XMMatrixRotationX(m_camAngleY) * XMMatrixRotationY(m_camAngleX);
 	pos = Multiply(pos, rotMat);
 	XMFLOAT3 f = Normalize(Neg(pos));
 	pos = pos+ XMFLOAT3(AXIS_WIDTH / 2, AXIS_HEIGHT / 2, AXIS_WIDTH / 2);
@@ -377,9 +428,8 @@ void DX::Plot3DGraphic::UpdatePlot()
 	m_linesObj.clear();
 	for (auto o : m_scattersObj)
 	{
-		o->Release();
+		o->SetEnable(false);
 	}
-	m_scattersObj.clear();
 	if (m_surfaceObj)
 	{
 		m_surfaceObj->Release();
@@ -387,70 +437,65 @@ void DX::Plot3DGraphic::UpdatePlot()
 	}
 
 	//calculate range
-	XMFLOAT2 x1Range(FLT_MAX, FLT_MIN);
-	XMFLOAT2 x2Range(FLT_MAX, FLT_MIN);
-	XMFLOAT2 vRange(FLT_MAX, FLT_MIN);
-	float x1Length;
-	float x2Length;
-	float vLength;
+	m_wOrigin = { FLT_MAX ,FLT_MAX ,FLT_MAX };
+	XMFLOAT3 wMax = { FLT_MIN,FLT_MIN ,FLT_MIN };
 	{
 		for (int i = 0; i < m_scattersPt.size(); ++i)
 		{
-			for (int j = 0; j < m_scattersPt[i].size(); ++j)
-			{
-				x1Range.x = min(x1Range.x, m_scattersPt[i][j].x);
-				x1Range.y = max(x1Range.y, m_scattersPt[i][j].x);
-				x2Range.x = min(x2Range.x, m_scattersPt[i][j].y);
-				x2Range.y = max(x2Range.y, m_scattersPt[i][j].y);
-				vRange.x = min(vRange.x, m_scattersPt[i][j].z);
-				vRange.y = max(vRange.y, m_scattersPt[i][j].z);
-			}
+			m_wOrigin.x = min(m_wOrigin.x, m_scattersPt[i].x);
+			wMax.x = max(wMax.x, m_scattersPt[i].x);
+			m_wOrigin.y = min(m_wOrigin.y, m_scattersPt[i].y);
+			wMax.y = max(wMax.y, m_scattersPt[i].y);
+			m_wOrigin.z = min(m_wOrigin.z, m_scattersPt[i].z);
+			wMax.z = max(wMax.z, m_scattersPt[i].z);
+			
 		}
 
 		for (int y = 0; y < m_surfaceX1.size(); ++y)
 		{
 			for (int x = 0; x < m_surfaceX1[y].size(); ++x)
 			{
-				x1Range.x = min(x1Range.x, m_surfaceX1[y][x]);
-				x1Range.y = max(x1Range.y, m_surfaceX1[y][x]);
-				x2Range.x = min(x2Range.x, m_surfaceX2[y][x]);
-				x2Range.y = max(x2Range.y, m_surfaceX2[y][x]);
-				vRange.x = min(vRange.x, m_surfaceV[y][x]);
-				vRange.y = max(vRange.y, m_surfaceV[y][x]);
+				m_wOrigin.x = min(m_wOrigin.x, m_surfaceX1[y][x]);
+				wMax.x = max(wMax.x, m_surfaceX1[y][x]);
+				m_wOrigin.y = min(m_wOrigin.y, m_surfaceX2[y][x]);
+				wMax.y = max(wMax.y, m_surfaceX2[y][x]);
+				m_wOrigin.z = min(m_wOrigin.z, m_surfaceV[y][x]);
+				wMax.z = max(wMax.z, m_surfaceV[y][x]);
 			}
 		}
-		x1Length = x1Range.y - x1Range.x;
-		x2Length = x2Range.y - x2Range.x;
-		vLength = vRange.y - vRange.x;
+		m_wSize = wMax - m_wOrigin;
 	}
 
 	//Create & Update Scatter Obj
 	if(m_scattersPt.size())
 	{
+		int iScatterObj = 0;
 		for (int i = 0; i < m_scattersPt.size(); ++i)
 		{
-			for (int j = 0; j < m_scattersPt[i].size(); ++j)
-			{
-				XMFLOAT3 mPt;
-				mPt.x = (m_scattersPt[i][j].x - x1Range.x) / x1Length;
-				mPt.y = (m_scattersPt[i][j].y - x2Range.x) / x2Length;
-				mPt.z = (m_scattersPt[i][j].z - vRange.x) / vLength;
+			XMFLOAT3 mPt = ((m_scattersPt[i] - m_wOrigin) / m_wSize);
+			mPt.x *= AXIS_WIDTH;
+			mPt.y *= AXIS_HEIGHT;
+			mPt.z *= AXIS_WIDTH;
 
+			if (iScatterObj >= m_scattersObj.size())
+			{
 				Actor* tmp;
 				CreateActor(ActorKind::Object, &tmp);
 				m_scattersObj.push_back((Object*)tmp);
-
-				m_scattersObj.back()->SetUnlit(true);
-				m_scattersObj.back()->SetShape(new SphereMesh(Device(), 1));
-				m_scattersObj.back()->GetTransform()->SetScale(m_scattersRad[i][j]);
-				m_scattersObj.back()->GetTransform()->SetTranslation(mPt);
-				auto mesh = m_scattersObj.back()->GetShape();
-
-				for (int k = 0; k < mesh->Count(); ++k)
-				{
-					mesh->SetColor(k, m_scattersCol[i][j]);
-				}
+				m_scattersObj[iScatterObj]->SetShape(new SphereMesh(Device(), 1));
 			}
+
+			m_scattersObj[iScatterObj]->SetEnable(true);
+			m_scattersObj[iScatterObj]->SetUnlit(true);
+			m_scattersObj[iScatterObj]->GetTransform()->SetScale(m_scattersRad[i]);
+			m_scattersObj[iScatterObj]->GetTransform()->SetTranslation(mPt);
+			auto mesh = m_scattersObj[iScatterObj]->GetShape();
+
+			for (int k = 0; k < mesh->Count(); ++k)
+			{
+				mesh->SetColor(k, m_scattersCol[i]);
+			}
+			iScatterObj++;
 		}
 	}
 	
@@ -475,9 +520,9 @@ void DX::Plot3DGraphic::UpdatePlot()
 				int index = j * n1 + i;
 
 				Vertex vert;
-				vert.pos.x = AXIS_WIDTH * (m_surfaceX1[j][i] - x1Range.x) / (x1Range.y - x1Range.x);
-				vert.pos.z = AXIS_WIDTH * (m_surfaceX2[j][i] - x2Range.x) / (x2Range.y - x2Range.x);
-				vert.pos.y = AXIS_HEIGHT * (m_surfaceV[j][i] - vRange.x) / (vRange.y - vRange.x);
+				vert.pos.x = AXIS_WIDTH * (m_surfaceX1[j][i] - m_wOrigin.x) / m_wSize.x;
+				vert.pos.z = AXIS_WIDTH * (m_surfaceX2[j][i] - m_wOrigin.z) / m_wSize.z;
+				vert.pos.y = AXIS_HEIGHT * (m_surfaceV[j][i] - m_wOrigin.y) / m_wSize.y;
 
 				auto col = GetColorScale((m_surfaceV[j][i] - m_surfaceColRange.x) / (m_surfaceColRange.y - m_surfaceColRange.x));
 				vert.color.x = col.x;
@@ -510,14 +555,14 @@ void DX::Plot3DGraphic::UpdatePlot()
 	}
 
 	//Update Axis Unit
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < m_axisUnitPX.size(); ++i)
 	{
-		m_axisUnitPX[i]->SetStr(ToString(x2Range.x + x2Length * i, 0));
+		m_axisUnitPX[i]->SetStr(ToString(m_wOrigin.z + i*m_wSize.z/ (m_axisUnitPX.size()-1), 0));
 
-		m_axisUnitNX[i]->SetStr(ToString(x2Range.x + x2Length * i,0));
+		m_axisUnitNX[i]->SetStr(ToString(m_wOrigin.z + i * m_wSize.z / (m_axisUnitPX.size()-1),0));
 
-		m_axisUnitPZ[i]->SetStr(ToString(x1Range.x + x1Length * i,0));
+		m_axisUnitPZ[i]->SetStr(ToString(m_wOrigin.x + i * m_wSize.x / (m_axisUnitPX.size()-1),0));
 
-		m_axisUnitNZ[i]->SetStr(ToString(x1Range.x + x1Length*i,0));
+		m_axisUnitNZ[i]->SetStr(ToString(m_wOrigin.x + i * m_wSize.x /( m_axisUnitPX.size()-1),0));
 	}
 }
