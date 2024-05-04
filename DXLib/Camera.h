@@ -3,6 +3,7 @@
 #include "Actor.h"
 #include "LayerMask.h"
 #include "Geometrics.h"
+#include "Buffer.h"
 
 namespace DX
 {
@@ -12,7 +13,6 @@ namespace DX
 	};
 
 	class Transform;
-	class Buffer;
 
 	struct Frustum
 	{
@@ -68,11 +68,12 @@ namespace DX
 		float GetAspectRatio()const { return aspectRatio; }
 
 		const Frustum* GetFrustum()const { return &frustum; }
-		Transform* transform;
 
+		Transform* GetTrasform() { return m_transform.get(); }
 
 
 	private:
+		std::unique_ptr<Transform> m_transform;
 		void SetView();
 		void SetProj();
 
@@ -90,6 +91,6 @@ namespace DX
 		int layer = LAYER_ALL;
 
 
-		Buffer* m_cbPos;
+		std::unique_ptr<Buffer> m_cbPos;
 	};
 }

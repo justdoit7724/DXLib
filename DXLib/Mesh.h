@@ -22,7 +22,7 @@ namespace DX {
 	public:
 		Mesh();
 		Mesh(const Mesh* other);
-		~Mesh();
+		~Mesh() {}
 
 		void GetLBound(OUT DirectX::XMFLOAT3* minPt, OUT DirectX::XMFLOAT3* maxPt);
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveType() { return m_primitiveType; }
@@ -49,12 +49,12 @@ namespace DX {
 		void SetPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY p) { m_primitiveType = p; }
 
 		DirectX::XMFLOAT3 m_lMinPt, m_lMaxPt;
-		ID3D11Buffer* m_vertexBuffer = nullptr;
-		ID3D11Buffer* m_indexBuffer = nullptr;
+		std::unique_ptr<ID3D11Buffer> m_vertexBuffer;
+		std::unique_ptr<ID3D11Buffer> m_indexBuffer;
 		D3D11_PRIMITIVE_TOPOLOGY m_primitiveType;
 
 
-		int* m_indice;
+		std::unique_ptr<int[]> m_indice;
 		int m_indexCount;
 
 		std::vector<Vertex> m_vertice;

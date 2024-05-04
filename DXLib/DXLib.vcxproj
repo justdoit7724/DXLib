@@ -83,6 +83,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -158,6 +159,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /q /y "$(SolutionDir)$(Platform)\$(Configuration)\*.lib" "C:\Users\justd\OneDrive\Desktop\DL_Visualizer\DL_Visualizer\DL_Visualizer\PackageLib\"
+xcopy /q /y "$(SolutionDir)$(Platform)\$(Configuration)\*.dll" "C:\Users\justd\OneDrive\Desktop\DL_Visualizer\DL_Visualizer\DL_Visualizer\PackageLib\"
+xcopy /q /y "$(SolutionDir)$(Platform)\$(Configuration)\*.cso" "C:\Users\justd\OneDrive\Desktop\DL_Visualizer\DL_Visualizer\DL_Visualizer\PackageLib\"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
@@ -175,6 +182,8 @@
     <ClInclude Include="CylinderMesh.h" />
     <ClInclude Include="DepthStencilState.h" />
     <ClInclude Include="DXLibExport.h" />
+    <ClInclude Include="DXUtility.h" />
+    <ClInclude Include="FactoryComponent.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Geometrics.h" />
     <ClInclude Include="Graphic.h" />
@@ -202,7 +211,6 @@
     <ClInclude Include="ShaderReg.h" />
     <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="SphereMesh.h" />
-    <ClInclude Include="Text.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TurnController.h" />
     <ClInclude Include="Vertex.h" />
@@ -275,6 +283,7 @@
     <ClCompile Include="dllmain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="FactoryComponent.cpp" />
     <ClCompile Include="Geometrics.cpp" />
     <ClCompile Include="Graphic.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -358,7 +367,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Transform.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

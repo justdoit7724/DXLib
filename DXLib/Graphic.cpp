@@ -8,11 +8,11 @@
 #include "Object.h"
 #include "Light.h"
 #include "Camera.h"
-#include "Text.h"
 #include "CubeMesh.h"
 #include "ShaderReg.h"
 #include "Transform.h"
 #include "CubeCollider.h"
+#include "Buffer.h"
 
 namespace DX {
 
@@ -47,6 +47,9 @@ namespace DX {
 		scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
+		IDXGISwapChain* swapchain;
+		ID3D11Device* device;
+		ID3D11DeviceContext* dcontext;
 		HRESULT hr = D3D11CreateDeviceAndSwapChain(
 			NULL,
 			D3D_DRIVER_TYPE_HARDWARE,
@@ -56,23 +59,31 @@ namespace DX {
 			0,
 			D3D11_SDK_VERSION,
 			&scd,
-			&m_swapchain,
-			&m_device,
+			&swapchain,
+			&device,
 			NULL,
-			&m_dContext);
+			&dcontext);
 		r_assert(hr);
+		m_swapchain = std::unique_ptr<IDXGISwapChain, Delete_Release>(swapchain);
+		m_device = std::unique_ptr<ID3D11Device, Delete_Release>(device);
+		m_dContext = std::unique_ptr<ID3D11DeviceContext, Delete_Release>(dcontext);
 
+		ID3D11Texture2D* backbuffer;
 		hr = m_swapchain->GetBuffer(
 			0,
 			__uuidof(ID3D11Texture2D),
-			reinterpret_cast<void**>(&m_backBuffer));
+			reinterpret_cast<void**>(&backbuffer));
 		r_assert(hr);
+		m_backBuffer = std::unique_ptr<ID3D11Texture2D, Delete_Release>(backbuffer);
 
+		ID3D11RenderTargetView* rtv;
 		hr = m_device->CreateRenderTargetView(
-			m_backBuffer,
+			backbuffer,
 			nullptr,
-			&m_rtv);
+			&rtv);
 		r_assert(hr);
+		m_rtv = std::unique_ptr<ID3D11RenderTargetView, Delete_Release>(rtv);
+
 
 #pragma region Depth&Stencil Buffer
 
@@ -89,11 +100,13 @@ namespace DX {
 		ds_desc.CPUAccessFlags = 0;
 		ds_desc.MiscFlags = 0;
 
+		ID3D11Texture2D* dsTex;
 		hr = m_device->CreateTexture2D(
 			&ds_desc,
 			nullptr,
-			&m_depthStencilBuffer);
+			&dsTex);
 		r_assert(hr);
+		m_depthStencilBuffer = std::unique_ptr<ID3D11Texture2D, Delete_Release>(dsTex);
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc;
 		ZeroMemory(&dsv_desc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
@@ -108,12 +121,14 @@ namespace DX {
 		{
 			dsv_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
 		}
+		ID3D11DepthStencilView* dsv;
 		hr = m_device->CreateDepthStencilView(
-			m_depthStencilBuffer,
+			dsTex,
 			&dsv_desc,
-			&m_dsView);
+			&dsv);
 		r_assert(hr);
-		m_dContext->OMSetRenderTargets(1, &m_rtv, m_dsView);
+		m_dsView = std::unique_ptr<ID3D11DepthStencilView, Delete_Release>(dsv);
+		m_dContext->OMSetRenderTargets(1, &rtv, m_dsView.get());
 
 #pragma endregion
 
@@ -136,9 +151,11 @@ namespace DX {
 		ZeroMemory(&rs_desc, sizeof(D3D11_RASTERIZER_DESC));
 		rs_desc.FillMode = D3D11_FILL_SOLID;
 		rs_desc.CullMode = D3D11_CULL_BACK;
-		hr = m_device->CreateRasterizerState(&rs_desc, &m_rasterizerState);
+		ID3D11RasterizerState* rstate;
+		hr = m_device->CreateRasterizerState(&rs_desc, &rstate);
 		r_assert(hr);
-		m_dContext->RSSetState(m_rasterizerState);
+		m_rasterizerState = std::unique_ptr<ID3D11RasterizerState, Delete_Release>(rstate);
+		m_dContext->RSSetState(m_rasterizerState.get());
 #pragma endregion
 
 #pragma region Sampler
@@ -172,17 +189,8 @@ namespace DX {
 
 	Graphic::~Graphic()
 	{
-		m_backBuffer->Release();
-		m_device->Release();
-		m_dContext->Release();
-		m_swapchain->Release();
-
-		m_rtv->Release();
-		m_dsView->Release();
-		m_depthStencilBuffer->Release();
-		m_rasterizerState->Release();
-
 	}
+
 
 	void Graphic::Update(float spf)
 	{
@@ -194,15 +202,15 @@ namespace DX {
 			m_pickHit = NOWHERE;
 			m_curPicked = nullptr;
 			float closestDist = FLT_MAX;
-			
-			for (auto a : m_actors[ActorKind::Object])
+
+			for (int i=0;i< m_actors[ActorKind::Object].size();++i)
 			{
-				Object* obj = (Object*)a;
+				Object* obj = (Object*)m_actors[ActorKind::Object][i];
 				XMFLOAT3 hit;
 
 				if (obj->IsPicking(camRay, hit))
 				{
-					float dist = SqrLength(hit - m_mainCamera->transform->GetPos());
+					float dist = SqrLength(hit - m_mainCamera->GetTrasform()->GetPos());
 					if (closestDist > dist)
 					{
 						closestDist = dist;
@@ -233,7 +241,7 @@ namespace DX {
 						m_mainCamera = nullptr;
 					}
 
-					delete curActor;
+					delete it->second[i];
 					it->second.erase(it->second.begin() + i);
 				}
 				else
@@ -271,36 +279,37 @@ namespace DX {
 		m_swapchain->Present(1, 0);
 
 		const float black[4] = { m_bkgColor.x,m_bkgColor.y,m_bkgColor.z,0 };
-		m_dContext->ClearRenderTargetView(m_rtv, black);
-		m_dContext->ClearDepthStencilView(m_dsView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_dContext->ClearRenderTargetView(m_rtv.get(), black);
+		m_dContext->ClearDepthStencilView(m_dsView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 	void Graphic::BindView()
 	{
-		m_dContext->OMSetRenderTargets(1, &m_rtv, m_dsView);
+		auto rtv = m_rtv.get();
+		m_dContext->OMSetRenderTargets(1, &rtv, m_dsView.get());
 	}
 	ID3D11Device* Graphic::Device()const
 	{
-		return m_device;
+		return m_device.get();
 	}
 	ID3D11DeviceContext* Graphic::DContext()const
 	{
-		return m_dContext;
+		return m_dContext.get();
 	}
 	ID3D11Texture2D* Graphic::DepthBuffer()const
 	{
-		return m_depthStencilBuffer;
+		return m_depthStencilBuffer.get();
 	}
 	ID3D11Texture2D* Graphic::BackBuffer()
 	{
-		return m_backBuffer;
+		return m_backBuffer.get();
 	}
 	ID3D11DepthStencilView* Graphic::DSV()const
 	{
-		return m_dsView;
+		return m_dsView.get();
 	}
 	ID3D11RenderTargetView* Graphic::RTV()
 	{
-		return m_rtv;
+		return m_rtv.get();
 	}
 
 	HWND Graphic::GetHWND()const
@@ -331,13 +340,11 @@ namespace DX {
 		{
 		case ActorKind::Object:
 		{
-			Mesh* defaultMesh = new CubeMesh(m_device);
-
 			auto newObject = new Object(this);
 
-			newObject->SetShape(defaultMesh);
+			newObject->SetShape(std::make_unique<CubeMesh>(m_device.get()));
 			newObject->SetUnlit(false);
-			newObject->SetCollider(new CubeCollider(XMFLOAT3(0, 0, 0), XMFLOAT3(0.5, 0.5, 0.5)));
+			newObject->SetCollider(std::make_unique<CubeCollider>(XMFLOAT3(0, 0, 0), XMFLOAT3(0.5, 0.5, 0.5)));
 
 			*out = newObject;
 		}
@@ -383,11 +390,6 @@ namespace DX {
 
 				break;
 
-		case ActorKind::Text:
-
-			*out = new Text(this);
-
-			break;
 		default:
 
 			assert(false && "unidentified actor kind");
@@ -497,9 +499,9 @@ namespace DX {
 		if (m_mainCamera && m_enableCamMovement)
 		{
 			auto cam = (Camera*)m_mainCamera;
-			XMFLOAT3 newPos = cam->transform->GetPos();
-			XMFLOAT3 right = cam->transform->GetRight();
-			XMFLOAT3 forward = cam->transform->GetForward();
+			XMFLOAT3 newPos = cam->GetTrasform()->GetPos();
+			XMFLOAT3 right = cam->GetTrasform()->GetRight();
+			XMFLOAT3 forward = cam->GetTrasform()->GetForward();
 			const float speed = 50;
 
 
@@ -528,10 +530,10 @@ namespace DX {
 			m_prevMousePt.x = m_mouseX;
 			m_prevMousePt.y = m_mouseY;
 			const XMMATRIX rotMat = XMMatrixRotationX(m_camAngleX) * XMMatrixRotationY(m_camAngleY);
-			cam->transform->SetTranslation(newPos);
+			cam->GetTrasform()->SetTranslation(newPos);
 			XMFLOAT3 f = DX::MultiplyDir(FORWARD, rotMat);
 			XMFLOAT3 u = DX::MultiplyDir(UP, rotMat);
-			cam->transform->SetRot(f, u);
+			cam->GetTrasform()->SetRot(f, u);
 		}
 	}
 

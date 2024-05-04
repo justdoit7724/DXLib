@@ -3,7 +3,6 @@
 #include "Object.h"
 #include "LineMesh.h"
 #include "Transform.h"
-#include "Text.h"
 #include "CircleMesh.h"
 #include "Camera.h"
 
@@ -31,16 +30,17 @@ Plot2DGraphic::Plot2DGraphic(HWND hwnd)
 	CreateActor(ActorKind::Camera, &tmp);
 	auto cam = (Camera*)tmp;
 	cam->SetFrame(FRAME_KIND_ORTHOGONAL, XMFLOAT2(SCN_PLOT_MARGIN_LEFT*2+ SCN_PLOT_WIDTH, SCN_PLOT_MARGIN_BOTTOM*2+SCN_PLOT_HEIGHT), 0.1, 100, NULL, NULL);
-	cam->transform->SetRot(FORWARD);
+	cam->GetTrasform()->SetRot(FORWARD);
 	SetMainCamera(cam);
-	cam->transform->SetTranslation((SCN_PLOT_MARGIN_LEFT*2 + SCN_PLOT_WIDTH)/2, (SCN_PLOT_MARGIN_BOTTOM*2 + SCN_PLOT_HEIGHT) / 2, -10);
+	cam->GetTrasform()->SetTranslation((SCN_PLOT_MARGIN_LEFT * 2 + SCN_PLOT_WIDTH) / 2, (SCN_PLOT_MARGIN_BOTTOM * 2 + SCN_PLOT_HEIGHT) / 2, -10);
 
 	CreateActor(ActorKind::Object, &tmp);
 	m_axis = (Object*)tmp;
 	tmp = nullptr;
 
 
-	Mesh* mesh = new LineMesh();
+	m_axis->SetShape(std::make_unique<LineMesh>());
+	Mesh* mesh = m_axis->GetShape();
 	mesh->Resize(3);
 	mesh->SetPos(0, XMFLOAT3(SCN_PLOT_MARGIN_LEFT, SCN_PLOT_MARGIN_BOTTOM, 0));
 	mesh->SetPos(1, XMFLOAT3(SCN_PLOT_MARGIN_LEFT+ SCN_PLOT_WIDTH, SCN_PLOT_MARGIN_BOTTOM, 0));
@@ -51,30 +51,9 @@ Plot2DGraphic::Plot2DGraphic(HWND hwnd)
 	std::vector<int> indice = { 0,1, 0,2 };
 	mesh->SetIndice(indice.data(), indice.size());
 	m_axis->GetTransform()->SetTranslation(0, 0, 0);
-	m_axis->SetShape(mesh);
 	m_axis->SetUnlit(true);
 
 
-	float unitSpacing = 10;
-	for (int i = 0; i < 6; ++i)
-	{
-		CreateActor(ActorKind::Text, &tmp);
-		m_axisHorUnits.push_back((Text*)tmp);
-		m_axisHorUnits.back()->Set3D(true);
-		m_axisHorUnits.back()->SetStr(std::to_string(i * SCN_PLOT_WIDTH / 5));
-		m_axisHorUnits.back()->SetScale(0.5, 0.5);
-		m_axisHorUnits.back()->SetPos(SCN_PLOT_MARGIN_LEFT+i* SCN_PLOT_WIDTH /5, SCN_PLOT_MARGIN_BOTTOM - unitSpacing, 0);
-		m_axisHorUnits.back()->SetAlign(Text::Align::Left);
-
-		CreateActor(ActorKind::Text, &tmp);
-		m_axisVerUnits.push_back((Text*)tmp);
-		m_axisVerUnits.back()->Set3D(true);
-		std::string str = std::to_string(i * SCN_PLOT_HEIGHT / 5);
-		m_axisVerUnits.back()->SetStr(str);
-		m_axisVerUnits.back()->SetScale(0.5, 0.5);
-		m_axisVerUnits.back()->SetPos(SCN_PLOT_MARGIN_LEFT, SCN_PLOT_MARGIN_BOTTOM + i * SCN_PLOT_HEIGHT / 5, 0);
-		m_axisVerUnits.back()->SetAlign(Text::Align::Right);
-	}
 
 
 	//CreateActor(ActorKind::Object, &tmp);
@@ -183,7 +162,6 @@ void DX::Plot2DGraphic::Clear()
 {
 	ClearPlot();
 	ClearScatter();
-	ClearAxis();
 }
 
 void DX::Plot2DGraphic::ClearPlot()
@@ -209,22 +187,6 @@ void DX::Plot2DGraphic::ClearScatter()
 	m_scatterObjs.clear();
 }
 
-void DX::Plot2DGraphic::ClearAxis()
-{
-	for (int i = 0; i < m_axisHorUnits.size(); ++i)
-	{
-		m_axisHorUnits[i]->Release();
-		m_axisVerUnits[i]->Release();
-	}
-	m_axisHorUnits.clear();
-	m_axisVerUnits.clear();
-
-	if (m_axis)
-	{
-		m_axis->Release();
-		m_axis = nullptr;
-	}
-}
 
 void DX::Plot2DGraphic::ClearSurface()
 {
@@ -237,18 +199,6 @@ void DX::Plot2DGraphic::ClearSurface()
 		m_surfaceObj->Release();
 		m_surfaceObj = nullptr;
 	}
-}
-
-void DX::Plot2DGraphic::EnableXUnit(bool enable)
-{
-	for (int i = 0; i < m_axisHorUnits.size(); ++i)
-		m_axisHorUnits[i]->SetEnable(enable);
-}
-
-void DX::Plot2DGraphic::EnableYUnit(bool enable)
-{
-	for (int i = 0; i < m_axisVerUnits.size(); ++i)
-		m_axisVerUnits[i]->SetEnable(enable);
 }
 
 DirectX::XMFLOAT2 DX::Plot2DGraphic::GetOrigin()
@@ -342,7 +292,7 @@ void DX::Plot2DGraphic::UpdatePlot()
 			m_scatterObjs.push_back((Object*)tmp);
 			m_scatterObjs.back()->EnablePick(false);
 			m_scatterObjs.back()->SetUnlit(true);
-			m_scatterObjs.back()->SetShape(new CircleMesh(Device(), 10));
+			m_scatterObjs.back()->SetShape(std::make_unique<CircleMesh>(Device(), 10));
 			m_scatterObjs.back()->GetTransform()->SetScale(m_scatterRads[i][j]);
 			m_scatterObjs.back()->GetTransform()->SetTranslation(mPt);
 			m_scatterObjs.back()->GetTransform()->SetRot(UP);
@@ -467,26 +417,4 @@ void DX::Plot2DGraphic::UpdatePlot()
 	}
 
 
-	//Update axis
-	int nFracX = 0;
-	if (x1Length < 0.1)
-		nFracX = 3;
-	else if (x1Length < 1)
-		nFracX = 2;
-	else if (x1Length < 10)
-		nFracX = 1;
-	int nFracY = 0;
-	if (x2Length < 0.1)
-		nFracY = 3;
-	else if (x2Length < 1)
-		nFracY = 2;
-	else if (x2Length < 10)
-		nFracY = 1;
-
-	for (int i = 0; i < m_axisVerUnits.size(); ++i)
-	{
-		m_axisHorUnits[i]->SetStr(ToString(x1Range.x + (x1Length * i)/ (m_axisVerUnits.size()-1), nFracX));
-
-		m_axisVerUnits[i]->SetStr(ToString(x2Range.x + (x2Length * i)/ (m_axisVerUnits.size()-1), nFracY));
-	}
 }

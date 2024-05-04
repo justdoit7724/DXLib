@@ -2,11 +2,15 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <DirectXMath.h>
+#include <memory>
+#include "DXUtility.h"
 #include "Actor.h"
 
 
 namespace DX
 {
+	
+
 	class VertexLayout;
 	class Camera;
 	class Object;
@@ -55,16 +59,16 @@ namespace DX
 
 		HWND m_hwnd;
 
-		ID3D11Device* m_device;
-		ID3D11DeviceContext* m_dContext;
+		std::unique_ptr<ID3D11Device, Delete_Release> m_device;
+		std::unique_ptr<ID3D11DeviceContext,Delete_Release> m_dContext;
 
-		ID3D11Texture2D* m_backBuffer;
-		ID3D11Texture2D* m_depthStencilBuffer;
+		std::unique_ptr<ID3D11Texture2D, Delete_Release> m_backBuffer;
+		std::unique_ptr<ID3D11Texture2D, Delete_Release> m_depthStencilBuffer;
 		D3D11_VIEWPORT m_viewport;
-		IDXGISwapChain* m_swapchain;
-		ID3D11RenderTargetView* m_rtv;
-		ID3D11DepthStencilView* m_dsView;
-		ID3D11RasterizerState* m_rasterizerState;
+		std::unique_ptr<IDXGISwapChain,Delete_Release> m_swapchain;
+		std::unique_ptr<ID3D11RenderTargetView,Delete_Release> m_rtv;
+		std::unique_ptr<ID3D11DepthStencilView,Delete_Release> m_dsView;
+		std::unique_ptr<ID3D11RasterizerState, Delete_Release> m_rasterizerState;
 		DirectX::XMFLOAT4 m_bkgColor;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> m_vertLayout;

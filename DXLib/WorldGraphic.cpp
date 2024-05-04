@@ -13,7 +13,7 @@ WorldGraphic::WorldGraphic(HWND hwnd, int msaa)
 	CreateActor(ActorKind::Camera, &tmp);
 	SetMainCamera((Camera*)tmp);
 	Camera* cam = (Camera*)tmp;
-	cam->transform->SetTranslation(0, 0, -10);
+	cam->GetTrasform()->SetTranslation(0, 0, -10);
 	CreateActor(ActorKind::Light_Direction, &tmp);
 	DirectionalLight* light;
 	light = (DirectionalLight*)tmp;

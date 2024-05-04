@@ -70,21 +70,21 @@ Object::Object(ID3D11Device* device, ID3D11DeviceContext* dContext, std::string 
 DX::Object::Object(Graphic* graphic)
 	:Actor(graphic, ActorKind::Object), m_mesh(nullptr), m_isUnlit(false), m_outlineMode(false), m_collider(nullptr), m_meshOutline(nullptr), m_enablePick(true)
 {
-	transform = new Transform();
+	m_transform = std::make_unique<Transform>();
 	auto layout = graphic->GetLayout();
-	vs = new VShader(graphic->Device(), "StdVS.cso", layout.data(), layout.size());
-	ps = new PShader(graphic->Device(), "StdPS.cso");
+	m_vs = std::make_unique<VShader>(graphic->Device(), "StdVS.cso", layout.data(), layout.size());
+	m_ps = std::make_unique<PShader>(graphic->Device(), "StdPS.cso");
 
-	vs->AddCB(graphic->Device(), 0, 1, sizeof(SHADER_STD_TRANSF));
-	ps->AddCB(graphic->Device(), SHADER_REG_CB_UNLIT, 1, sizeof(XMFLOAT4));
+	m_vs->AddCB(graphic->Device(), 0, 1, sizeof(SHADER_STD_TRANSF));
+	m_ps->AddCB(graphic->Device(), SHADER_REG_CB_UNLIT, 1, sizeof(XMFLOAT4));
 
-	m_material = new SHADER_MATERIAL(XMFLOAT3(0.6, 0.6, 0.6), 0.4, XMFLOAT3(0.6, 0.6, 0.6), XMFLOAT3(1.0, 1.0, 1.0));
-	ps->AddCB(graphic->Device(), SHADER_REG_CB_MATERIAL, 1, sizeof(SHADER_MATERIAL));
-	ps->WriteCB(graphic->DContext(), SHADER_REG_CB_MATERIAL, m_material);
+	m_material = std::make_unique<SHADER_MATERIAL>(XMFLOAT3(0.6, 0.6, 0.6), 0.4, XMFLOAT3(0.6, 0.6, 0.6), XMFLOAT3(1.0, 1.0, 1.0));
+	m_ps->AddCB(graphic->Device(), SHADER_REG_CB_MATERIAL, 1, sizeof(SHADER_MATERIAL));
+	m_ps->WriteCB(graphic->DContext(), SHADER_REG_CB_MATERIAL, m_material.get());
 
-	blendState = new BlendState(graphic->Device(), nullptr);
-	dsState = new DepthStencilState(graphic->Device(), nullptr);
-	rsState = new RasterizerState(graphic->Device(), nullptr);
+	m_blendState = std::make_unique<BlendState>(graphic->Device(), nullptr);
+	m_dsState = std::make_unique<DepthStencilState>(graphic->Device(), nullptr);
+	m_rsState = std::make_unique<RasterizerState>(graphic->Device(), nullptr);
 
 	D3D11_DEPTH_STENCIL_DESC outlineMaskDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
 	outlineMaskDesc.DepthFunc = D3D11_COMPARISON_NEVER;
@@ -92,27 +92,18 @@ DX::Object::Object(Graphic* graphic)
 	outlineMaskDesc.StencilWriteMask = 0xff;
 	outlineMaskDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	outlineMaskDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_REPLACE;
-	m_outlineMaskDSState = new DepthStencilState(graphic->Device(), &outlineMaskDesc);
+	m_outlineMaskDSState =std::make_unique<DepthStencilState>(graphic->Device(), &outlineMaskDesc);
 	D3D11_DEPTH_STENCIL_DESC outlineRenderDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
 	outlineRenderDesc.DepthEnable = false;
 	outlineRenderDesc.StencilEnable = true;
 	outlineRenderDesc.StencilReadMask = 0xff;
 	outlineRenderDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;
 	outlineRenderDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	m_outlineRenderDSState = new DepthStencilState(graphic->Device(), &outlineRenderDesc);
+	m_outlineRenderDSState = std::make_unique<DepthStencilState>(graphic->Device(), &outlineRenderDesc);
 }
 
 Object::~Object()
 {
-	delete transform;
-	delete vs;
-	delete ps;
-
-	delete dsState;
-	delete blendState;
-	delete rsState;
-
-	delete m_material;
 }
 
 void Object::Update()
@@ -132,10 +123,10 @@ void Object::UpdateBound()
 	XMFLOAT3 boundlMinPt;
 	XMFLOAT3 boundlMaxPt;
 	m_mesh->GetLBound(&boundlMinPt, &boundlMaxPt);
-	XMMATRIX world = transform->WorldMatrix();
+	XMMATRIX world = m_transform->WorldMatrix();
 	XMFLOAT3 wMinPt = Multiply(boundlMinPt, world);
 	XMFLOAT3 wMaxPt = Multiply(boundlMaxPt, world);
-	bound.p = transform->GetPos();
+	bound.p = m_transform->GetPos();
 	bound.rad = Length(wMinPt- wMaxPt) * 0.5f;
 }
 
@@ -144,8 +135,8 @@ void Object::UpdateCollider()
 	if (!m_collider)
 		return;
 
-	m_collider->Translate(transform->GetPos());
-	m_collider->SetRotate(transform->GetForward(), transform->GetUp());
+	m_collider->Translate(m_transform->GetPos());
+	m_collider->SetRotate(m_transform->GetForward(), m_transform->GetUp());
 	//m_collider->SetScale(transform->GetScale());
 }
 
@@ -187,25 +178,19 @@ void DX::Object::SetUnlit(bool isUnlit)
 {
 	m_isUnlit = isUnlit;
 	XMFLOAT4 unlitPassData(isUnlit ? 1 : 0, 0, 0, 0);
-	ps->WriteCB(m_graphic->DContext(), SHADER_REG_CB_UNLIT, &unlitPassData);
+	m_ps->WriteCB(m_graphic->DContext(), SHADER_REG_CB_UNLIT, &unlitPassData);
 }
 
-void DX::Object::SetShape(Mesh* shape)
+void DX::Object::SetShape(std::unique_ptr<Mesh> shape)
 {
-	if (m_mesh)
-		delete m_mesh;
+	m_mesh = std::move(shape);
 
-	m_mesh = shape;
-
-	m_meshOutline = new Mesh(shape);
+	m_meshOutline = std::make_unique<Mesh>(m_mesh.get());
 }
 
-void DX::Object::SetCollider(Collider* collider)
+void DX::Object::SetCollider(std::unique_ptr<Collider> collider)
 {
-	if (m_collider)
-		delete m_collider;
-
-	m_collider = collider;
+	m_collider = std::move(collider);
 }
 
 void DX::Object::SetOutlineColor(DirectX::XMFLOAT4 color)
@@ -235,14 +220,14 @@ void Object::Render()
 		auto vmat = curCam->VMat();
 		auto pmat = curCam->ProjMat();
 
-		const SHADER_STD_TRANSF STransformation(transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
-		vs->WriteCB(m_graphic->DContext(), 0, &STransformation);
+		const SHADER_STD_TRANSF STransformation(m_transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
+		m_vs->WriteCB(m_graphic->DContext(), 0, &STransformation);
 
-		vs->Apply(m_graphic);
-		ps->Apply(m_graphic);
+		m_vs->Apply(m_graphic);
+		m_ps->Apply(m_graphic);
 
-		blendState->Apply(m_graphic);
-		rsState->Apply(m_graphic);
+		m_blendState->Apply(m_graphic);
+		m_rsState->Apply(m_graphic);
 
 
 
@@ -252,7 +237,7 @@ void Object::Render()
 			m_mesh->Apply(m_graphic);
 		}
 
-		dsState->Apply(m_graphic);
+		m_dsState->Apply(m_graphic);
 		m_mesh->Apply(m_graphic);
 
 		if (m_outlineMode)//pass2
@@ -261,14 +246,14 @@ void Object::Render()
 			m_outlineRenderDSState->Apply(m_graphic);
 
 			auto oriUnlit = IsUnlit();
-			auto oriScale = transform->GetScale();
+			auto oriScale = m_transform->GetScale();
 
 			SetUnlit(true);
-			transform->SetScale(oriScale * 1.05);
-			const SHADER_STD_TRANSF outlineTransformation(transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
-			transform->SetScale(oriScale);
+			m_transform->SetScale(oriScale * 1.05);
+			const SHADER_STD_TRANSF outlineTransformation(m_transform->WorldMatrix(), vmat, pmat, 1, 1000, XM_PIDIV2, 1);
+			m_transform->SetScale(oriScale);
 
-			vs->WriteCB(m_graphic->DContext(), 0, &outlineTransformation);
+			m_vs->WriteCB(m_graphic->DContext(), 0, &outlineTransformation);
 			m_meshOutline->Apply(m_graphic);
 
 			SetUnlit(oriUnlit);
@@ -308,7 +293,7 @@ bool Object::IsPicking(Geometrics::Ray ray, DirectX::XMFLOAT3& hit) const
 
 	if (!m_collider)
 	{
-		hit = transform->GetPos();
+		hit = m_transform->GetPos();
 		return IntersectRaySphere(ray, bound);
 	}
 

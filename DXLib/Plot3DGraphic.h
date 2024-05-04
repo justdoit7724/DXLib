@@ -4,7 +4,6 @@
 namespace DX
 {
     class Object;
-    class Text;
 
     class DXLIB_DLL Plot3DGraphic :
         public Graphic
@@ -24,8 +23,6 @@ namespace DX
         void ClearLines();
         void ClearAxis();
         void Clear();
-        void SetX1Title(std::string title);
-        void SetX2Title(std::string title);
         DirectX::XMFLOAT3 WPos2PlotPos(DirectX::XMFLOAT3 actPos);
 
         DirectX::XMFLOAT3 GetOrigin();
@@ -60,14 +57,6 @@ namespace DX
         std::vector<DirectX::XMFLOAT4> m_linesCol;
         std::vector<Object*> m_linesObj;
 
-        std::vector<Text*> m_axisUnitPX;
-        Text* m_axisTitlePX;
-        std::vector<Text*> m_axisUnitNX;
-        Text* m_axisTitleNX;
-        std::vector<Text*> m_axisUnitPZ;
-        Text* m_axisTitlePZ;
-        std::vector<Text*> m_axisUnitNZ;
-        Text* m_axisTitleNZ;
 
     };
 }

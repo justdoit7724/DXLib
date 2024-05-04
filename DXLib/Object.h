@@ -25,21 +25,21 @@ namespace DX {
 	protected:
 
 		//component
-		Transform* transform;
-		Mesh* m_mesh;
-		VShader* vs;
-		PShader* ps;
-		BlendState* blendState = nullptr;
-		RasterizerState* rsState = nullptr;
-		DepthStencilState* dsState = nullptr;
-		Collider* m_collider;
+		std::unique_ptr<Transform> m_transform;
+		std::unique_ptr<Mesh> m_mesh;
+		std::unique_ptr<VShader> m_vs;
+		std::unique_ptr<PShader> m_ps;
+		std::unique_ptr<BlendState> m_blendState = nullptr;
+		std::unique_ptr<RasterizerState> m_rsState = nullptr;
+		std::unique_ptr<DepthStencilState> m_dsState = nullptr;
+		std::unique_ptr<Collider> m_collider;
 		bool m_isUnlit;
 		bool m_enablePick;
 
 		//outline
-		DepthStencilState* m_outlineMaskDSState = nullptr;
-		DepthStencilState* m_outlineRenderDSState = nullptr;
-		Mesh* m_meshOutline;
+		std::unique_ptr<DepthStencilState> m_outlineMaskDSState = nullptr;
+		std::unique_ptr<DepthStencilState> m_outlineRenderDSState = nullptr;
+		std::unique_ptr<Mesh> m_meshOutline;
 
 	public:
 
@@ -63,16 +63,16 @@ namespace DX {
 
 		bool IsUnlit();
 		void SetUnlit(bool isUnlit);
-		void SetShape(Mesh* shape);
-		void SetCollider(Collider* collider);
-		Transform* GetTransform() { return transform; }
-		Mesh* GetShape() { return m_mesh; }
-		Collider* GetCollider() { return m_collider; }
+		void SetShape(std::unique_ptr<Mesh> shape);
+		void SetCollider(std::unique_ptr<Collider> collider);
+		Transform* GetTransform() { return m_transform.get(); }
+		Mesh* GetShape() { return m_mesh.get(); }
+		Collider* GetCollider() { return m_collider.get(); }
 
 		void SetOutlineColor(DirectX::XMFLOAT4 color);
 		bool m_outlineMode;
 
-		SHADER_MATERIAL* m_material;
+		std::unique_ptr<SHADER_MATERIAL> m_material;
 		ID3D11ShaderResourceView* m_mainTex;
 		ID3D11ShaderResourceView* m_normal;
 

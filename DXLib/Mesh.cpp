@@ -76,18 +76,9 @@ Mesh::Mesh(const Mesh* other)
 	m_vertice = other->m_vertice;
 	m_lMinPt = other->m_lMinPt;
 	m_lMaxPt = other->m_lMaxPt;
-	SetIndice(other->m_indice, other->m_indexCount);
+	SetIndice(other->m_indice.get(), other->m_indexCount);
 	m_primitiveType = other->m_primitiveType;
 	m_updated = false;
-}
-
-
-Mesh::~Mesh()
-{
-	m_vertexBuffer->Release();
-	m_indexBuffer->Release();
-
-	delete[] m_indice;
 }
 
 
@@ -113,11 +104,9 @@ void Mesh::SetIndice(const int* indice, int indexCount)
 {
 	m_indexCount = indexCount;
 
-	if (m_indice)
-		delete[] m_indice;
 	int totalByte = sizeof(int) * indexCount;
-	m_indice = new int[totalByte];
-	memcpy(m_indice, indice, totalByte);
+	m_indice = std::make_unique<int[]>(totalByte);
+	memcpy(m_indice.get(), indice, totalByte);
 
 	m_updated = false;
 }
@@ -160,11 +149,13 @@ void Mesh::Update(ID3D11Device* device)
 		vb_desc.StructureByteStride = 0;
 		D3D11_SUBRESOURCE_DATA vb_data;
 		vb_data.pSysMem = m_vertice.data();
+		ID3D11Buffer* tmpBuffer;
 		HRESULT hr = device->CreateBuffer(
 			&vb_desc,
 			&vb_data,
-			&m_vertexBuffer);
+			&tmpBuffer);
 		r_assert(hr);
+		m_vertexBuffer = std::unique_ptr<ID3D11Buffer>(tmpBuffer);
 
 		D3D11_BUFFER_DESC ibd;
 		ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -174,9 +165,10 @@ void Mesh::Update(ID3D11Device* device)
 		ibd.MiscFlags = 0;
 		ibd.StructureByteStride = 0;
 		D3D11_SUBRESOURCE_DATA iinitData;
-		iinitData.pSysMem = m_indice;
-		hr = device->CreateBuffer(&ibd, &iinitData, &m_indexBuffer);
+		iinitData.pSysMem = m_indice.get();
+		hr = device->CreateBuffer(&ibd, &iinitData, &tmpBuffer);
 		r_assert(hr);
+		m_indexBuffer = std::unique_ptr<ID3D11Buffer>(tmpBuffer);
 	}
 }
 
@@ -193,8 +185,9 @@ void Mesh::Apply(const Graphic* graphic)
 		graphic->DContext()->IASetPrimitiveTopology(m_primitiveType);
 		UINT offset = 0;
 		UINT verticeSize = sizeof(Vertex);
-		graphic->DContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &verticeSize, &offset);
-		graphic->DContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		auto vb = m_vertexBuffer.get();
+		graphic->DContext()->IASetVertexBuffers(0, 1, &vb, &verticeSize, &offset);
+		graphic->DContext()->IASetIndexBuffer(m_indexBuffer.get(), DXGI_FORMAT_R32_UINT, 0);
 
 		graphic->DContext()->DrawIndexed(m_indexCount, 0, 0);
 	}

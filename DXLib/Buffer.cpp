@@ -9,22 +9,14 @@ Buffer::Buffer(ID3D11Device* device, D3D11_BUFFER_DESC* desc, void * initValue)
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = initValue;
 
-	if (initValue == nullptr)
-	{
-		HRESULT hr = device->CreateBuffer(
-				desc,
-				nullptr,
-				&m_resource);
-		r_assert(hr);
-	}
-	else
-	{
-		HRESULT hr = device->CreateBuffer(
-				desc,
-				&data,
-				&m_resource);
-		r_assert(hr);
-	}
+	ID3D11Buffer* tmp=nullptr;
+	HRESULT hr = device->CreateBuffer(
+			desc,
+		!initValue? nullptr : &data,
+			&tmp);
+	r_assert(hr);
+
+	m_resource = std::unique_ptr<ID3D11Buffer, Delete_Release>(tmp);
 }
 
 UINT SizeCB(UINT byteSize)
@@ -34,58 +26,51 @@ UINT SizeCB(UINT byteSize)
 Buffer::Buffer(ID3D11Device* device, UINT byteSize)
 	:desc(CD3D11_BUFFER_DESC(SizeCB(byteSize), D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, 0, 0))
 {
-	HRESULT hr = device->CreateBuffer(&desc, nullptr, &m_resource);
+	ID3D11Buffer* tmp=nullptr;
+	HRESULT hr = device->CreateBuffer(&desc, nullptr, &tmp);
 	r_assert(hr);
+	m_resource = std::unique_ptr<ID3D11Buffer, Delete_Release>(tmp);
 }
 
-Buffer::~Buffer()
-{
-	m_resource->Release();
-	if(m_srv)
-		m_srv->Release();
-	if(m_uav)
-		m_uav->Release();
-}
 
 
 void Buffer::SetSRV(ID3D11Device* device, D3D11_SHADER_RESOURCE_VIEW_DESC* srvDesc)
 {
-	if (m_srv)
-		m_srv->Release();
-
+	ID3D11ShaderResourceView* tmp;
 	HRESULT hr = device->CreateShaderResourceView(
-			m_resource,
+			m_resource.get(),
 			srvDesc,
-			&m_srv);
+			&tmp);
 	r_assert(hr);
+
+	m_srv = std::unique_ptr<ID3D11ShaderResourceView, Delete_Release>(tmp);
 }
 void Buffer::SetUAV(ID3D11Device* device, D3D11_UNORDERED_ACCESS_VIEW_DESC * uavDesc)
 {
-	if (m_uav)
-		m_uav->Release();
-
+	ID3D11UnorderedAccessView* tmp;
 	HRESULT hr = device->CreateUnorderedAccessView(
-			m_resource,
+			m_resource.get(),
 			uavDesc,
-			&m_uav);
+			&tmp);
 	r_assert(hr);
+	m_uav = std::unique_ptr<ID3D11UnorderedAccessView, Delete_Release>(tmp);
 }
 
 void Buffer::Write(ID3D11DeviceContext* dContext, const void * data)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 
-	dContext->Map(m_resource, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
+	dContext->Map(m_resource.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
 	CopyMemory(mappedData.pData, data, desc.ByteWidth);
-	dContext->Unmap(m_resource, 0);
+	dContext->Unmap(m_resource.get(), 0);
 }
 
-void DX::Buffer::GetSRV(ID3D11ShaderResourceView** srv)
+ID3D11ShaderResourceView* DX::Buffer::GetSRV()
 {
-	*srv = m_srv;
+	return m_srv.get();
 }
 
-void DX::Buffer::GetUAV(ID3D11UnorderedAccessView** uav)
+ID3D11UnorderedAccessView* DX::Buffer::GetUAV()
 {
-	*uav = m_uav;
+	return m_uav.get();
 }

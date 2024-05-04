@@ -8,8 +8,7 @@ namespace DX {
 		Camera,
 		Light_Direction,
 		Light_Point,
-		Light_Spot,
-		Text
+		Light_Spot
 	};
 
 	class Graphic;
@@ -26,6 +25,7 @@ namespace DX {
 		bool m_isRelease;
 		bool m_enable;
 		int m_priority;
+
 		
 	public:
 		virtual void Update() {}
@@ -35,6 +35,7 @@ namespace DX {
 		void SetEnable(bool enable);
 		void SetPriority(int priority);
 		const ActorKind m_kind;
+
 
 		std::string m_id;
 	};

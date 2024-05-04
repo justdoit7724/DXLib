@@ -22,6 +22,9 @@
     <Filter Include="Actors">
       <UniqueIdentifier>{0169cd75-e37d-4bcc-a1b2-302314b52204}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{ac340ee5-bb7b-4760-b36a-d2cfc6631d39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -159,10 +162,13 @@
     <ClInclude Include="Light.h">
       <Filter>Actors</Filter>
     </ClInclude>
-    <ClInclude Include="Text.h">
-      <Filter>Actors</Filter>
-    </ClInclude>
     <ClInclude Include="CircleMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FactoryComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUtility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -266,13 +272,13 @@
     <ClCompile Include="Light.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="Text.cpp">
-      <Filter>Actors</Filter>
-    </ClCompile>
     <ClCompile Include="Geometrics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CircleMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FactoryComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -152,7 +152,8 @@ void VShader::Apply(const Graphic* graphic)
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		graphic->DContext()->VSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		auto res = i->second.data->Get();
+		graphic->DContext()->VSSetConstantBuffers(i->first, i->second.arrayNum, &res);
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -216,7 +217,8 @@ void GShader::Apply(const Graphic* graphic)
 
 		for (auto i = cbs.begin(); i != cbs.end(); ++i)
 		{
-			graphic->DContext()->GSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+			auto res = i->second.data->Get();
+			graphic->DContext()->GSSetConstantBuffers(i->first, i->second.arrayNum, &res);
 		}
 		for (auto i = srvs.begin(); i != srvs.end(); ++i)
 		{
@@ -280,7 +282,8 @@ void PShader::Apply(const Graphic* graphic)
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		graphic->DContext()->PSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		auto res = i->second.data->Get();
+		graphic->DContext()->PSSetConstantBuffers(i->first, i->second.arrayNum, &res);
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -339,7 +342,8 @@ void CShader::Apply(const Graphic* graphic)
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		graphic->DContext()->CSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		auto res = i->second.data->Get();
+		graphic->DContext()->CSSetConstantBuffers(i->first, i->second.arrayNum,&res);
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -401,7 +405,8 @@ void HShader::Apply(const Graphic* graphic)
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		graphic->DContext()->HSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		auto res= i->second.data->Get();
+		graphic->DContext()->HSSetConstantBuffers(i->first, i->second.arrayNum, &res);
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{
@@ -464,7 +469,8 @@ void DShader::Apply(const Graphic* graphic)
 
 	for (auto i = cbs.begin(); i != cbs.end(); ++i)
 	{
-		graphic->DContext()->DSSetConstantBuffers(i->first, i->second.arrayNum, i->second.data->GetAddress());
+		auto res = i->second.data->Get();
+		graphic->DContext()->DSSetConstantBuffers(i->first, i->second.arrayNum, &res);
 	}
 	for (auto i = srvs.begin(); i != srvs.end(); ++i)
 	{

@@ -4,7 +4,7 @@
 
 namespace DX
 {
-
+	class Buffer;
 class Transform;
 class Camera;
 class Object;
@@ -21,7 +21,7 @@ struct SHADER_SPOT_LIGHT;
 		DirectX::XMFLOAT3 ambient;
 		DirectX::XMFLOAT3 diffuse;
 		DirectX::XMFLOAT3 specular;
-		ID3D11Buffer* m_cb;
+		std::unique_ptr<Buffer> m_cb;
 
 		Light(const Graphic* graphic, int index, ActorKind lightKind);
 
@@ -50,7 +50,6 @@ struct SHADER_SPOT_LIGHT;
 		DirectionalLight(const Graphic* graphic, int id, DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 d, DirectX::XMFLOAT3 s, float intensity, DirectX::XMFLOAT3 dir);
 
 	public:
-		~DirectionalLight();
 		void SetAmbient(const DirectX::XMFLOAT3& a) override;
 		void SetDiffuse(const DirectX::XMFLOAT3& d) override;
 		void SetSpecular(const DirectX::XMFLOAT3& s) override;
@@ -75,7 +74,6 @@ struct SHADER_SPOT_LIGHT;
 		PointLight(const Graphic* graphic, int id, DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 d, DirectX::XMFLOAT3 s, float intensity, DirectX::XMFLOAT3 att, DirectX::XMFLOAT3 pos);
 
 	public:
-		~PointLight();
 		void SetAmbient(const DirectX::XMFLOAT3& a) override;
 		void SetDiffuse(const DirectX::XMFLOAT3& d) override;
 		void SetSpecular(const DirectX::XMFLOAT3& s) override;
@@ -103,7 +101,6 @@ struct SHADER_SPOT_LIGHT;
 		SpotLight(const Graphic* graphic, int id, DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 d, DirectX::XMFLOAT3 s, float range, float spot, float intensity, float rad, DirectX::XMFLOAT3 att, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT3 dir);
 
 	public:
-		~SpotLight();
 		void SetAmbient(const DirectX::XMFLOAT3& a) override;
 		void SetDiffuse(const DirectX::XMFLOAT3& d) override;
 		void SetSpecular(const DirectX::XMFLOAT3& s) override;

@@ -13,6 +13,7 @@
 #include "RasterizerState.h"
 #include "ShaderReg.h"
 #include "DepthStencilState.h"
+#include "Buffer.h"
 
 using namespace DX;
 
@@ -26,8 +27,8 @@ DirectionalLight::DirectionalLight(const Graphic* graphic, int id, XMFLOAT3 a, X
 	cb_desc.MiscFlags = 0;
 	cb_desc.StructureByteStride = 0;
 	cb_desc.Usage = D3D11_USAGE_DYNAMIC;
-	HRESULT hr = m_graphic->Device()->CreateBuffer(&cb_desc, nullptr, &m_cb);
-	r_assert(hr);
+
+	m_cb = std::make_unique<Buffer>(m_graphic->Device(), &cb_desc,nullptr);
 
 	for (int i = 0; i < LIGHT_MAX_EACH; ++i)
 	{
@@ -47,10 +48,6 @@ DirectionalLight::DirectionalLight(const Graphic* graphic, int id, XMFLOAT3 a, X
 
 }
 
-DirectionalLight::~DirectionalLight()
-{
-	m_cb->Release();
-}
 
 void DirectionalLight::SetAmbient(const XMFLOAT3 & a)
 {
@@ -101,12 +98,10 @@ void DirectionalLight::Update()
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	ZeroMemory(&mappedData, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-	HRESULT hr = m_graphic->DContext()->Map(m_cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
-	r_assert(hr);
-	CopyMemory(mappedData.pData, &m_data, sizeof(SHADER_DIRECTIONAL_LIGHT));
-	m_graphic->DContext()->Unmap(m_cb, 0);
+	m_cb->Write(m_graphic->DContext(), &m_data);
 
-	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_DIRECTIONAL_LIGHT, 1, &m_cb);
+	auto res = m_cb->Get();
+	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_DIRECTIONAL_LIGHT, 1, &res);
 }
 
 PointLight::PointLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMFLOAT3 s, float intensity, XMFLOAT3 att, XMFLOAT3 pos)
@@ -119,8 +114,10 @@ PointLight::PointLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, X
 	cb_desc.MiscFlags = 0;
 	cb_desc.StructureByteStride = 0;
 	cb_desc.Usage = D3D11_USAGE_DYNAMIC;
-	HRESULT hr = m_graphic->Device()->CreateBuffer(&cb_desc, nullptr, &m_cb);
-	r_assert(hr);
+
+	m_cb = std::make_unique<Buffer>(m_graphic->Device(), &cb_desc,nullptr);
+
+
 
 	/*
 	set id to 0 for this project, bc separated device
@@ -144,10 +141,6 @@ PointLight::PointLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, X
 	Enable(true);
 }
 
-PointLight::~PointLight()
-{
-	m_cb->Release();
-}
 
 void PointLight::SetAmbient(const XMFLOAT3 & a)
 {
@@ -202,16 +195,10 @@ void PointLight::Update()
 {
 	HRESULT hr;
 
+	m_cb->Write(m_graphic->DContext(), &m_data);
 
-
-	D3D11_MAPPED_SUBRESOURCE mappedData;
-
-	hr = m_graphic->DContext()->Map(m_cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
-	r_assert(hr);
-	CopyMemory(mappedData.pData, &m_data, sizeof(SHADER_POINT_LIGHT));
-	m_graphic->DContext()->Unmap(m_cb, 0);
-
-	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_POINT_LIGHT, 1, &m_cb);
+	auto res = m_cb->Get();
+	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_POINT_LIGHT, 1, &res);
 }
 
 SpotLight::SpotLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMFLOAT3 s, float r, float spot, float intensity, float rad, XMFLOAT3 att, XMFLOAT3 pos, XMFLOAT3 dir)
@@ -224,8 +211,7 @@ SpotLight::SpotLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMF
 	cb_desc.MiscFlags = 0;
 	cb_desc.StructureByteStride = 0;
 	cb_desc.Usage = D3D11_USAGE_DYNAMIC;
-	HRESULT hr = graphic->Device()->CreateBuffer(&cb_desc, nullptr, &m_cb);
-	r_assert(hr);
+	m_cb = std::make_unique<Buffer>(m_graphic->Device(), &cb_desc,nullptr);
 
 	SetAmbient(a);
 	SetDiffuse(d);
@@ -240,10 +226,6 @@ SpotLight::SpotLight(const Graphic* graphic, int id, XMFLOAT3 a, XMFLOAT3 d, XMF
 	Enable(true);
 }
 
-SpotLight::~SpotLight()
-{
-	m_cb->Release();
-}
 
 void SpotLight::SetAmbient(const XMFLOAT3 & a)
 {
@@ -320,14 +302,10 @@ void DX::SpotLight::Update()
 {
 	HRESULT hr;
 
-	D3D11_MAPPED_SUBRESOURCE mappedData;
+	m_cb->Write(m_graphic->DContext(), &m_data);
 
-	hr = m_graphic->DContext()->Map(m_cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
-	r_assert(hr);
-	CopyMemory(mappedData.pData, &m_data, sizeof(SHADER_SPOT_LIGHT));
-	m_graphic->DContext()->Unmap(m_cb, 0);
-
-	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_SPOT_LIGHT, 1, &m_cb);
+	auto res = m_cb->Get();
+	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_SPOT_LIGHT, 1, &res);
 }
 
 DX::Light::Light(const Graphic* graphic,int index, ActorKind lightKind)

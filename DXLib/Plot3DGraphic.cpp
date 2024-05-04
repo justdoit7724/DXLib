@@ -6,7 +6,6 @@
 #include "LineMesh.h"
 #include "SphereMesh.h"
 
-#include "Text.h"
 #include <iostream>
 using namespace DX;
 
@@ -37,7 +36,8 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	tmp = nullptr;
 
 
-	Mesh* mesh = new LineMesh();
+	m_axisPX->SetShape(std::make_unique<LineMesh>());
+	Mesh* mesh = m_axisPX->GetShape();
 	mesh->Resize(11);
 	mesh->SetPos(0, XMFLOAT3(0, 0, 0));
 	mesh->SetPos(1, XMFLOAT3(0, AXIS_HEIGHT, 0));
@@ -65,24 +65,24 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 	mesh->SetIndice(indiceR.data(), indiceR.size());
 	m_axisPX->GetTransform()->SetTranslation(AXIS_WIDTH, 0, 0);
 	m_axisPX->GetTransform()->SetRot(LEFT);
-	m_axisPX->SetShape(mesh);
 	m_axisPX->SetUnlit(true);
 
 	m_axisNX->GetTransform()->SetTranslation(0, 0, AXIS_WIDTH);
 	m_axisNX->GetTransform()->SetRot(RIGHT);
-	m_axisNX->SetShape(new Mesh(mesh));
+	m_axisNX->SetShape(std::make_unique<Mesh>(mesh));
 	m_axisNX->SetUnlit(true);
 
 	m_axisPZ->GetTransform()->SetTranslation(AXIS_WIDTH, 0, AXIS_WIDTH);
 	m_axisPZ->GetTransform()->SetRot(BACKWARD);
-	m_axisPZ->SetShape(new Mesh(mesh));
+	m_axisPZ->SetShape(std::make_unique<Mesh>(mesh));
 	m_axisPZ->SetUnlit(true);
 
 	m_axisNZ->GetTransform()->SetRot(FORWARD);
-	m_axisNZ->SetShape(new Mesh(mesh));
+	m_axisNZ->SetShape(std::make_unique<Mesh>(mesh));
 	m_axisNZ->SetUnlit(true);
 
-	mesh = new LineMesh();
+	m_axisB->SetShape(std::make_unique<LineMesh>());
+	mesh = m_axisB->GetShape();
 	mesh->Resize(20);
 	mesh->SetPos(0, XMFLOAT3(0, 0, 0));
 	mesh->SetPos(1, XMFLOAT3(AXIS_WIDTH, 0, 0));
@@ -132,75 +132,7 @@ DX::Plot3DGraphic::Plot3DGraphic(HWND hwnd, int msaa)
 		indiceR.push_back(2 * i + 1);
 	}
 	mesh->SetIndice(indiceR.data(), indiceR.size());
-	m_axisB->SetShape(mesh);
 	m_axisB->SetUnlit(true);
-
-	float unitSpacing = AXIS_WIDTH / 25;
-	for (int i = 0; i < 5; ++i)
-	{
-		CreateActor(ActorKind::Text, &tmp);
-		m_axisUnitPX.push_back((Text*)tmp);
-		m_axisUnitPX.back()->Set3D(true);
-		m_axisUnitPX.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
-		m_axisUnitPX.back()->SetScale(0.5, 0.5);
-		m_axisUnitPX.back()->SetPos(AXIS_WIDTH+ unitSpacing, 0, i * AXIS_WIDTH / 4);
-		m_axisUnitPX.back()->SetAlign(Text::Center);
-
-		CreateActor(ActorKind::Text, &tmp);
-		m_axisUnitNX.push_back((Text*)tmp);
-		m_axisUnitNX.back()->Set3D(true);
-		m_axisUnitNX.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
-		m_axisUnitNX.back()->SetScale(0.5, 0.5);
-		m_axisUnitNX.back()->SetPos(-unitSpacing, 0, i * AXIS_WIDTH / 4);
-		m_axisUnitNX.back()->SetAlign(Text::Center);
-
-		CreateActor(ActorKind::Text, &tmp);
-		m_axisUnitPZ.push_back((Text*)tmp);
-		m_axisUnitPZ.back()->Set3D(true);
-		m_axisUnitPZ.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
-		m_axisUnitPZ.back()->SetScale(0.5, 0.5);
-		m_axisUnitPZ.back()->SetPos(i * AXIS_WIDTH / 4, 0, AXIS_WIDTH + unitSpacing);
-		m_axisUnitPZ.back()->SetAlign(Text::Center);
-
-		CreateActor(ActorKind::Text, &tmp);
-		m_axisUnitNZ.push_back((Text*)tmp);
-		m_axisUnitNZ.back()->Set3D(true);
-		m_axisUnitNZ.back()->SetStr(std::to_string(i * AXIS_WIDTH / 4));
-		m_axisUnitNZ.back()->SetScale(0.5, 0.5);
-		m_axisUnitNZ.back()->SetPos(i*AXIS_WIDTH/4, 0, -unitSpacing);
-		m_axisUnitNZ.back()->SetAlign(Text::Center);
-	}
-	
-
-	CreateActor(ActorKind::Text, &tmp);
-	m_axisTitlePX = (Text*)tmp;
-	m_axisTitlePX->Set3D(true);
-	m_axisTitlePX->SetStr("X2");
-	m_axisTitlePX->SetScale(1.2,1.2);
-	m_axisTitlePX->SetPos(AXIS_WIDTH + unitSpacing*4, 0, AXIS_WIDTH / 2);
-	m_axisTitlePX->SetAlign(Text::Center);
-	CreateActor(ActorKind::Text, &tmp);
-	m_axisTitleNX = (Text*)tmp;
-	m_axisTitleNX->Set3D(true);
-	m_axisTitleNX->SetStr("X2");
-	m_axisTitleNX->SetScale(1.2, 1.2);
-	m_axisTitleNX->SetPos(- unitSpacing * 4, 0, AXIS_WIDTH / 2);
-	m_axisTitleNX->SetAlign(Text::Center);
-	CreateActor(ActorKind::Text, &tmp);
-	m_axisTitlePZ = (Text*)tmp;
-	m_axisTitlePZ->Set3D(true);
-	m_axisTitlePZ->SetStr("X1");
-	m_axisTitlePZ->SetScale(1.2, 1.2);
-	m_axisTitlePZ->SetPos(AXIS_WIDTH / 2, 0, AXIS_WIDTH+  unitSpacing * 4);
-	m_axisTitlePZ->SetAlign(Text::Center);
-	CreateActor(ActorKind::Text, &tmp);
-	m_axisTitleNZ = (Text*)tmp;
-	m_axisTitleNZ->Set3D(true);
-	m_axisTitleNZ->SetStr("X1");
-	m_axisTitleNZ->SetScale(1.2, 1.2);
-	m_axisTitleNZ->SetPos(AXIS_WIDTH / 2, 0, 0 - unitSpacing * 4);
-	m_axisTitleNZ->SetAlign(Text::Center);
-
 }
 
 DX::Plot3DGraphic::~Plot3DGraphic()
@@ -211,25 +143,15 @@ DX::Plot3DGraphic::~Plot3DGraphic()
 void DX::Plot3DGraphic::Update(float spf)
 {
 	auto mainCam = (Camera*)MainCamera();
-	bool enablePX = Dot(mainCam->transform->GetForward(), m_axisPX->GetTransform()->GetForward()) < 0.4;
-	bool enableNX = Dot(mainCam->transform->GetForward(), m_axisNX->GetTransform()->GetForward()) < 0.4;
-	bool enablePZ = Dot(mainCam->transform->GetForward(), m_axisPZ->GetTransform()->GetForward()) < 0.4;
-	bool enableNZ = Dot(mainCam->transform->GetForward(), m_axisNZ->GetTransform()->GetForward()) < 0.4;
-	for (int i = 0; i < 5; ++i)
-	{
-		m_axisUnitPX[i]->SetEnable(!enablePX);
-		m_axisUnitNX[i]->SetEnable(!enableNX);
-		m_axisUnitPZ[i]->SetEnable(!enablePZ);
-		m_axisUnitNZ[i]->SetEnable(!enableNZ);
-	}
+	bool enablePX = Dot(mainCam->GetTrasform()->GetForward(), m_axisPX->GetTransform()->GetForward()) < 0.4;
+	bool enableNX = Dot(mainCam->GetTrasform()->GetForward(), m_axisNX->GetTransform()->GetForward()) < 0.4;
+	bool enablePZ = Dot(mainCam->GetTrasform()->GetForward(), m_axisPZ->GetTransform()->GetForward()) < 0.4;
+	bool enableNZ = Dot(mainCam->GetTrasform()->GetForward(), m_axisNZ->GetTransform()->GetForward()) < 0.4;
+	
 	m_axisPX->SetEnable(enablePX);
 	m_axisNX->SetEnable(enableNX);
 	m_axisPZ->SetEnable(enablePZ);
 	m_axisNZ->SetEnable(enableNZ);
-	m_axisTitlePX->SetEnable(!enablePX);
-	m_axisTitleNX->SetEnable(!enableNX);
-	m_axisTitlePZ->SetEnable(!enablePZ);
-	m_axisTitleNZ->SetEnable(!enableNZ);
 
 	Graphic::Update(spf);
 }
@@ -353,17 +275,6 @@ void DX::Plot3DGraphic::Clear()
 	ClearAxis();
 }
 
-void DX::Plot3DGraphic::SetX1Title(std::string title)
-{
-	m_axisTitleNZ->SetStr(title);
-	m_axisTitlePZ->SetStr(title);
-}
-
-void DX::Plot3DGraphic::SetX2Title(std::string title)
-{
-	m_axisTitleNX->SetStr(title);
-	m_axisTitlePX->SetStr(title);
-}
 
 DirectX::XMFLOAT3 DX::Plot3DGraphic::WPos2PlotPos(DirectX::XMFLOAT3 wPos)
 {
@@ -412,8 +323,8 @@ void DX::Plot3DGraphic::UpdateCamMovement(float spf)
 	XMFLOAT3 f = Normalize(Neg(pos));
 	pos = pos+ XMFLOAT3(AXIS_WIDTH / 2, AXIS_HEIGHT / 2, AXIS_WIDTH / 2);
 	
-	cam->transform->SetTranslation(pos);
-	cam->transform->SetRot(f);
+	cam->GetTrasform()->SetTranslation(pos);
+	cam->GetTrasform()->SetRot(f);
 
 
 	
@@ -482,7 +393,7 @@ void DX::Plot3DGraphic::UpdatePlot()
 				Actor* tmp;
 				CreateActor(ActorKind::Object, &tmp);
 				m_scattersObj.push_back((Object*)tmp);
-				m_scattersObj[iScatterObj]->SetShape(new SphereMesh(Device(), 1));
+				m_scattersObj[iScatterObj]->SetShape(std::make_unique<SphereMesh>(Device(), 1));
 			}
 
 			m_scattersObj[iScatterObj]->SetEnable(true);
@@ -552,17 +463,5 @@ void DX::Plot3DGraphic::UpdatePlot()
 			}
 		}
 		mesh->SetIndice(indice.data(), indice.size());
-	}
-
-	//Update Axis Unit
-	for (int i = 0; i < m_axisUnitPX.size(); ++i)
-	{
-		m_axisUnitPX[i]->SetStr(ToString(m_wOrigin.z + i*m_wSize.z/ (m_axisUnitPX.size()-1), 0));
-
-		m_axisUnitNX[i]->SetStr(ToString(m_wOrigin.z + i * m_wSize.z / (m_axisUnitPX.size()-1),0));
-
-		m_axisUnitPZ[i]->SetStr(ToString(m_wOrigin.x + i * m_wSize.x / (m_axisUnitPX.size()-1),0));
-
-		m_axisUnitNZ[i]->SetStr(ToString(m_wOrigin.x + i * m_wSize.x /( m_axisUnitPX.size()-1),0));
 	}
 }

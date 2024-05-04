@@ -3,7 +3,6 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "Graphic.h"
-#include "Buffer.h"
 #include "ShaderReg.h"
 
 using namespace DX;
@@ -14,19 +13,17 @@ using namespace DX;
 Camera::Camera(const Graphic* graphic, FRAME_KIND frameKind, float orthoScnWidth, float orthoScnHeight, float n, float f, float verticalViewRad, float aspectRatio, bool skipFrustum)
 	:Actor(graphic, ActorKind::Camera), m_scale(1)
 {
-	transform = new Transform();
+	m_transform = std::make_unique<Transform>();
 
 	SetView();
 	SetFrame(frameKind, XMFLOAT2(orthoScnWidth, orthoScnHeight), n, f, verticalViewRad, aspectRatio);
 
 	frustum.skip = skipFrustum;
 
-	m_cbPos = new Buffer(graphic->Device(), sizeof(XMFLOAT4));
+	m_cbPos = std::make_unique<Buffer>(graphic->Device(), sizeof(XMFLOAT4));
 }
 Camera::~Camera()
 {
-	delete m_cbPos;
-	delete transform;
 }
 void Camera::SetFrame(const FRAME_KIND fKind, XMFLOAT2 orthoSize, const float n, const float f, const float verticalViewRad, const float aspectRatio)
 {
@@ -50,10 +47,10 @@ void DX::Camera::SetScale(float scale)
 
 void Camera::SetView()
 {
-	XMFLOAT3 pos = transform->GetPos();
-	XMFLOAT3 forward = transform->GetForward();
-	XMFLOAT3 up = transform->GetUp();
-	XMFLOAT3 right = transform->GetRight();
+	XMFLOAT3 pos = m_transform->GetPos();
+	XMFLOAT3 forward = m_transform->GetForward();
+	XMFLOAT3 up = m_transform->GetUp();
+	XMFLOAT3 right = m_transform->GetRight();
 
 	float x = -Dot(pos, right);
 	float y = -Dot(pos, up);
@@ -105,10 +102,10 @@ void Camera::Update()
 {
 	if (!frustum.skip)
 	{
-		XMFLOAT3 p = transform->GetPos();
-		XMFLOAT3 forward = transform->GetForward();
-		XMFLOAT3 up = transform->GetUp();
-		XMFLOAT3 right = transform->GetRight();
+		XMFLOAT3 p = m_transform->GetPos();
+		XMFLOAT3 forward = m_transform->GetForward();
+		XMFLOAT3 up = m_transform->GetUp();
+		XMFLOAT3 right = m_transform->GetRight();
 
 		float tri = tan(verticalRadian * 0.5f);
 		XMFLOAT3 trDir = Normalize(
@@ -131,9 +128,10 @@ void Camera::Update()
 	SetView();
 	SetProj();
 
-	XMFLOAT3 pos = transform->GetPos();
+	XMFLOAT3 pos = m_transform->GetPos();
 	m_cbPos->Write(m_graphic->DContext(), &pos);
-	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_EYE, 1, m_cbPos->GetAddress());
+	auto posRes = m_cbPos->Get();
+	m_graphic->DContext()->PSSetConstantBuffers(SHADER_REG_CB_EYE, 1, &posRes);
 
 
 }
@@ -144,10 +142,10 @@ void Camera::Pick(XMFLOAT2 scnPos, OUT Geometrics::Ray* ray)const
 		-(scnPos.y * 2) / (float)m_size.y + 1);
 	XMFLOAT3 vDir = XMFLOAT3(NULL,NULL,NULL);
 
-	const XMFLOAT3 forward = transform->GetForward();
-	const XMFLOAT3 up = transform->GetUp();
-	const XMFLOAT3 right = transform->GetRight();
-	const XMFLOAT3 eye = transform->GetPos();
+	const XMFLOAT3 forward = m_transform->GetForward();
+	const XMFLOAT3 up = m_transform->GetUp();
+	const XMFLOAT3 right = m_transform->GetRight();
+	const XMFLOAT3 eye = m_transform->GetPos();
 	switch (curFrame)
 	{
 	case FRAME_KIND_PERSPECTIVE:

@@ -4,7 +4,6 @@
 namespace DX
 {
     class Object;
-    class Text;
 
     class DXLIB_DLL Plot2DGraphic :
         public Graphic
@@ -23,10 +22,7 @@ namespace DX
         void Clear();
         void ClearPlot();
         void ClearScatter();
-        void ClearAxis();
         void ClearSurface();
-        void EnableXUnit(bool enable);
-        void EnableYUnit(bool enable);
 
         DirectX::XMFLOAT2 GetOrigin();
         DirectX::XMFLOAT2 GetPlotSize();
@@ -38,9 +34,6 @@ namespace DX
 
         Object* m_axis;
         Object* m_plotQuad;
-
-        std::vector<Text*> m_axisHorUnits;
-        std::vector<Text*> m_axisVerUnits;
 
         std::vector<std::vector<DirectX::XMFLOAT2>> m_scatterPts;
         std::vector<std::vector<float>> m_scatterRads;

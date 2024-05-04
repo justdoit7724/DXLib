@@ -21,23 +21,6 @@
 
 
 
-#ifdef _WIN64
-
-#ifdef _DEBUG
-#pragma comment(lib, __FILE__"\\..\\DirectXTK\\x64\\Debug\\DirectXTK.lib")
-#else
-#pragma comment(lib, __FILE__"\\..\\DirectXTK\\x64\\Release\\DirectXTK.lib")
-#endif
-
-#else
-S
-#ifdef _DEBUG
-#pragma comment(lib, __FILE__"\\..\\DirectXTK\\Win32\\Debug\\DirectXTK.lib")
-#else
-#pragma comment(lib, __FILE__"\\..\\DirectXTK\\Win32\\Release\\DirectXTK.lib")
-#endif
-
-#endif
 
 
 
@@ -99,6 +82,9 @@ exit(-1);
 
 #define r_assert(r)	\
 assert(SUCCEEDED(r))
+
+
+	
 
 	inline std::string ToString(float f, int fracCount=2)
 	{
